@@ -117,6 +117,18 @@ export default function OrderSupportChat({
           setConversationStatus(row.status === "closed" ? "closed" : "open");
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "support_conversations", filter: "id=eq." + conversationId },
+        () => {
+          if (!active) return;
+          setConversationId(null);
+          setConversationStatus("open");
+          setMessages([]);
+          setDraft("");
+          setMessage("This ticket was deleted. You can click I Have Paid again if you still need support.");
+        }
+      )
       .subscribe();
 
     return () => {
@@ -163,9 +175,38 @@ export default function OrderSupportChat({
       setMessage(error.message);
       return;
     }
+
     const result = data as { conversation_id?: string };
     if (result.conversation_id) setConversationId(result.conversation_id);
-    setMessage("Payment reported. Your private support chat is open.");
+
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (sessionError || !accessToken) {
+      setMessage("Payment reported and your private support chat is open. Sign in again to send the Discord alert.");
+      return;
+    }
+
+    try {
+      const alertResponse = await fetch("/api/discord-order-log", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+        },
+        body: JSON.stringify({ orderId }),
+      });
+      const alertResult = await alertResponse.json().catch(() => ({}));
+      if (!alertResponse.ok) {
+        setMessage(
+          "Payment reported and your private support chat is open. Discord alert failed: " +
+          (alertResult.error ?? "Please contact Sumz Market support.")
+        );
+        return;
+      }
+      setMessage("Payment reported. Your private support chat is open, and Sumz Market has been notified in the Discord logs channel.");
+    } catch {
+      setMessage("Payment reported and your private support chat is open, but the Discord alert could not be sent.");
+    }
   }
 
   async function deleteTicket() {

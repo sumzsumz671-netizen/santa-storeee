@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import OrderSupportChat from "../../components/OrderSupportChat";
+import WalletTopUp from "../../components/WalletTopUp";
 
 type OrderItem = {
   id: string;
@@ -192,6 +193,8 @@ export default function Account() {
               Staff account detected. <a href="/admin" style={{ textDecoration: "underline", fontWeight: 800 }}>Open the admin panel →</a>
             </div>
           ) : null}
+
+          <WalletTopUp onWalletUpdated={loadDashboard} />
 
           <div style={{ marginTop: 38, marginBottom: 14 }}>
             <h2 style={{ fontSize: 25, marginBottom: 12 }}>Store balance activity</h2>

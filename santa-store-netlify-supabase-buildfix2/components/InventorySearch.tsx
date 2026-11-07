@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BuyWithBalance from "./BuyWithBalance";
 import ManualCheckout from "./ManualCheckout";
 
@@ -30,19 +30,48 @@ type InventoryGroup = {
 
 const money = (cents: number) => "$" + (cents / 100).toFixed(2);
 
-function productImage(product: Product) {
-  const value = (product.name + " " + (product.description ?? "") + " " + (product.category ?? "")).toLowerCase();
-  if (value.includes("skull trooper") || value.includes("skull")) return "/images/product-skull.svg";
-  if (value.includes("wildcat")) return "/images/product-wildcat.svg";
-  if (value.includes("nitro")) return "/images/product-nitro.svg";
-  if (value.includes("boost")) return "/images/product-boost.svg";
-  return null;
+const COSMETIC_ALIASES: Record<string, string> = {
+  "royale bomber": "Royale Bomber",
+  "merry minty axe": "Merry Mint Axe",
+  "trail blazer": "Trailblazer",
+  "mako glider": "Mako",
+  "dark skully": "Dark Skully",
+};
+
+function productCosmeticName(product: Product): string | null {
+  const original = product.name.trim();
+  let base = original
+    .replace(/^OG\\s+/i, "")
+    .replace(/\\s+FA$/i, "")
+    .split(" + ")[0]
+    .trim();
+
+  if (/\\b(v[- ]?bucks|skins?)\\b/i.test(base) || /^OG Save The World$/i.test(base)) {
+    return null;
+  }
+
+  const key = base.toLowerCase();
+  return COSMETIC_ALIASES[key] ?? base;
 }
 
-function ProductCard({ product }: { product: Product }) {
+function fallbackProductImage(product: Product) {
+  const name = product.name.toLowerCase();
+  const category = (product.category ?? "").toLowerCase();
+
+  if (name.includes("nitro")) return "/images/product-nitro.svg";
+  if (name.includes("boost")) return "/images/product-boost.svg";
+  if (name.includes("v-bucks") || name.includes("vbucks") || category.includes("v-bucks")) return "/images/product-vbucks.svg";
+  if (category.includes("rare season") || category.includes("og accounts") || name.startsWith("og ")) return "/images/product-og-bundle.svg";
+  if (category.includes("random accounts") || /\\bskins?\\b/i.test(name)) return "/images/product-random-skins.svg";
+  if (category.includes("fa accounts")) return "/images/product-fa-accounts.svg";
+  return "/images/product-fa-accounts.svg";
+}
+
+function ProductCard({ product, cosmeticImages }: { product: Product; cosmeticImages: Record<string, string> }) {
   const isFA = product.category === "Fortnite FA Accounts";
   const soldOut = product.stock_count === 0;
-  const image = productImage(product);
+  const cosmeticName = productCosmeticName(product);
+  const image = (cosmeticName ? cosmeticImages[cosmeticName] : null) || fallbackProductImage(product);
   const stockText = product.stock_count === null
     ? (product.stock_label ?? "Stock not listed")
     : product.stock_count === 1
@@ -98,6 +127,33 @@ function ProductCard({ product }: { product: Product }) {
 
 export default function InventorySearch({ groups }: { groups: InventoryGroup[] }) {
   const [query, setQuery] = useState("");
+  const [cosmeticImages, setCosmeticImages] = useState<Record<string, string>>({});
+  const cosmeticNames = useMemo(
+    () => [...new Set(groups.flatMap(group => group.products.map(productCosmeticName).filter((name): name is string => !!name)))],
+    [groups]
+  );
+
+  useEffect(() => {
+    if (!cosmeticNames.length) return;
+    const controller = new AbortController();
+
+    fetch("/api/product-art?names=" + encodeURIComponent(JSON.stringify(cosmeticNames)), {
+      signal: controller.signal,
+    })
+      .then(response => response.ok ? response.json() : Promise.reject(new Error("Artwork lookup unavailable")))
+      .then(result => {
+        if (result?.images && typeof result.images === "object") {
+          setCosmeticImages(result.images as Record<string, string>);
+        }
+      })
+      .catch(error => {
+        if (error?.name !== "AbortError") {
+          console.warn("Sumz Market product artwork could not be loaded.", error);
+        }
+      });
+
+    return () => controller.abort();
+  }, [cosmeticNames]);
   const filteredGroups = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return groups;
@@ -165,7 +221,7 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
                 <span className="market-group-arrow">↘</span>
               </div>
               <div className="market-product-grid">
-                {group.products.map(product => <ProductCard product={product} key={product.id} />)}
+                {group.products.map(product => <ProductCard product={product} cosmeticImages={cosmeticImages} key={product.id} />)}
               </div>
             </section>
           ))}

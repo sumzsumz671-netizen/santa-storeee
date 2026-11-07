@@ -18,6 +18,14 @@ type Order = {
   created_at: string;
   order_items: OrderItem[];
 };
+type WalletTransaction = {
+  id: string;
+  transaction_type: string;
+  amount_cents: number;
+  balance_after_cents: number;
+  note: string | null;
+  created_at: string;
+};
 
 const money = (cents: number) => "$" + (cents / 100).toFixed(2);
 const prettyStatus = (status: string) => status.replaceAll("_", " ");
@@ -28,6 +36,8 @@ export default function Account() {
   const [message, setMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [role, setRole] = useState("customer");
+  const [balance, setBalance] = useState(0);
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -41,16 +51,21 @@ export default function Account() {
       return;
     }
     setUserEmail(userResult.user.email ?? "");
-    const [{ data: profile }, { data: orderRows, error: orderError }] = await Promise.all([
-      supabase.from("profiles").select("role").eq("id", userResult.user.id).maybeSingle(),
+    const [{ data: profile }, { data: orderRows, error: orderError }, { data: walletRows, error: walletError }] = await Promise.all([
+      supabase.from("profiles").select("role,wallet_balance_cents").eq("id", userResult.user.id).maybeSingle(),
       supabase
         .from("orders")
         .select("id,order_number,status,payment_method,total_cents,created_at,order_items(id,product_name,quantity,unit_price_cents)")
         .order("created_at", { ascending: false }),
+      supabase.from("wallet_transactions")
+        .select("id,transaction_type,amount_cents,balance_after_cents,note,created_at")
+        .order("created_at", { ascending: false }).limit(12),
     ]);
     setRole(profile?.role ?? "customer");
+    setBalance(Number(profile?.wallet_balance_cents ?? 0));
     setOrders((orderRows ?? []) as Order[]);
-    setMessage(orderError ? "Your orders could not be loaded: " + orderError.message : "");
+    setTransactions((walletRows ?? []) as WalletTransaction[]);
+    setMessage(orderError ? "Your orders could not be loaded: " + orderError.message : walletError ? "Your wallet history could not be loaded: " + walletError.message : "");
     setLoading(false);
   }, []);
 
@@ -60,6 +75,8 @@ export default function Account() {
       if (!session) {
         setUserEmail("");
         setOrders([]);
+        setTransactions([]);
+        setBalance(0);
         setRole("customer");
       } else {
         setUserEmail(session.user.email ?? "");
@@ -125,6 +142,8 @@ export default function Account() {
     setBusy(false);
     setMessage(error?.message ?? "You have been signed out.");
     setOrders([]);
+    setTransactions([]);
+    setBalance(0);
     setUserEmail("");
   }
 
@@ -156,6 +175,10 @@ export default function Account() {
               <div className="muted">Orders</div>
               <h3 style={{ marginTop: 9 }}>{orders.length}</h3>
             </div>
+            <div className="product pbody">
+              <div className="muted">Store balance</div>
+              <h3 style={{ marginTop: 9, color: "#86efac" }}>{money(balance)}</h3>
+            </div>
           </div>
 
           {role === "admin" || role === "staff" ? (
@@ -163,6 +186,30 @@ export default function Account() {
               Staff account detected. <a href="/admin" style={{ textDecoration: "underline", fontWeight: 800 }}>Open the admin panel →</a>
             </div>
           ) : null}
+
+          <div style={{ marginTop: 38, marginBottom: 14 }}>
+            <h2 style={{ fontSize: 25, marginBottom: 12 }}>Store balance activity</h2>
+            {transactions.length === 0 ? (
+              <div className="product pbody muted">Your wallet activity will appear here. Refunds are added as store credit.</div>
+            ) : (
+              <div style={{ display: "grid", gap: 10 }}>
+                {transactions.map(transaction => (
+                  <article className="product pbody" key={transaction.id}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                      <div>
+                        <b style={{ textTransform: "capitalize" }}>{prettyStatus(transaction.transaction_type)}</b>
+                        <div className="muted">{transaction.note || "Store balance transaction"} · {new Date(transaction.created_at).toLocaleString()}</div>
+                      </div>
+                      <b style={{ color: transaction.amount_cents > 0 ? "#86efac" : "#fca5a5" }}>
+                        {transaction.amount_cents > 0 ? "+" : "−"}{money(Math.abs(transaction.amount_cents))}
+                      </b>
+                    </div>
+                    <div className="muted" style={{ marginTop: 8 }}>Balance after: {money(transaction.balance_after_cents)}</div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: 38, marginBottom: 14 }}>
             <h2 style={{ fontSize: 25, margin: 0 }}>Order history</h2>

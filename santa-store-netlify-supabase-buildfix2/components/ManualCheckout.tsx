@@ -13,11 +13,14 @@ const METHODS = [
 export default function ManualCheckout({
   productId,
   productName,
+  warrantyPriceCents,
 }: {
   productId: string;
   productName: string;
+  warrantyPriceCents?: number | null;
 }) {
   const [method, setMethod] = useState("cash_app");
+  const [withWarranty, setWithWarranty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
@@ -36,6 +39,7 @@ export default function ManualCheckout({
       p_product_id: productId,
       p_quantity: 1,
       p_payment_method: method,
+      p_warranty: withWarranty,
     });
     setBusy(false);
     if (error) {
@@ -50,7 +54,13 @@ export default function ManualCheckout({
 
   return (
     <div style={{ marginTop: 10, borderTop: "1px solid #303036", paddingTop: 12 }}>
-      <label className="muted" htmlFor={"method-" + productId}>Other payment method</label>
+      {typeof warrantyPriceCents === "number" ? (
+        <label className="muted" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <input type="checkbox" checked={withWarranty} onChange={event => setWithWarranty(event.target.checked)} disabled={busy || !!orderNumber} />
+          Add With Warranty · ${(warrantyPriceCents / 100).toFixed(2)}
+        </label>
+      ) : null}
+      <label className="muted" htmlFor={"method-" + productId}>Payment method</label>
       <select
         id={"method-" + productId}
         className="input"
@@ -73,7 +83,7 @@ export default function ManualCheckout({
         </div>
       ) : null}
       <p className="muted" style={{ margin: "8px 0 0", lineHeight: 1.45 }}>
-        Use the payment details provided by the store owner. Do not report payment until you have sent it.
+        {productName}. Use the payment details provided by the store owner. Do not report payment until you have sent it.
       </p>
     </div>
   );

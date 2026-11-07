@@ -119,9 +119,10 @@ export default function OrderSupportChat({
       )
       .on(
         "postgres_changes",
-        { event: "DELETE", schema: "public", table: "support_conversations", filter: "id=eq." + conversationId },
-        () => {
-          if (!active) return;
+        { event: "DELETE", schema: "public", table: "support_conversations" },
+        payload => {
+          const deleted = payload.old as { id?: string };
+          if (!active || deleted.id !== conversationId) return;
           setConversationId(null);
           setConversationStatus("open");
           setMessages([]);

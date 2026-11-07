@@ -17,6 +17,7 @@ export default function OrderSupportChat({
   isAdmin = false,
   customerEmail,
   canVouch = false,
+  orderCompleted = false,
 }: {
   orderId: string;
   orderNumber: string;
@@ -24,6 +25,7 @@ export default function OrderSupportChat({
   isAdmin?: boolean;
   customerEmail?: string;
   canVouch?: boolean;
+  orderCompleted?: boolean;
 }) {
   const [conversationId, setConversationId] = useState<string | null>(initialConversationId ?? null);
   const [conversationStatus, setConversationStatus] = useState<"open" | "closed">("open");
@@ -33,6 +35,7 @@ export default function OrderSupportChat({
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deletingTicket, setDeletingTicket] = useState(false);
   const [vouchOpen, setVouchOpen] = useState(false);
   const [vouchLoading, setVouchLoading] = useState(true);
   const [vouchBusy, setVouchBusy] = useState(false);
@@ -165,6 +168,37 @@ export default function OrderSupportChat({
     setMessage("Payment reported. Your private support chat is open.");
   }
 
+  async function deleteTicket() {
+    if (!conversationId || isAdmin) return;
+    const confirmed = window.confirm("Delete this support ticket and its chat messages? This cannot be undone.");
+    if (!confirmed) return;
+
+    setDeletingTicket(true);
+    setMessage("");
+    const { data, error } = await supabase
+      .from("support_conversations")
+      .delete()
+      .eq("id", conversationId)
+      .select("id")
+      .maybeSingle();
+    setDeletingTicket(false);
+
+    if (error) {
+      setMessage("Could not delete your ticket: " + error.message);
+      return;
+    }
+    if (!data) {
+      setMessage("Ticket was not found or does not belong to your account.");
+      return;
+    }
+
+    setConversationId(null);
+    setConversationStatus("open");
+    setMessages([]);
+    setDraft("");
+    setMessage("Your ticket was deleted. Click I Have Paid to open a new support chat.");
+  }
+
   async function postVouchToDiscord(vouchId: string) {
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
     const accessToken = sessionData.session?.access_token;
@@ -281,6 +315,80 @@ export default function OrderSupportChat({
     }
   }
 
+  const vouchPanel = canVouch && !isAdmin ? (
+    <div style={{ marginTop: 18, borderTop: "1px solid #393940", paddingTop: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <div>
+          <b>Marketplace vouch</b>
+          <p className="muted" style={{ margin: "5px 0 0" }}>
+            {orderCompleted
+              ? "Your order is completed. Leave feedback to be posted as a verified purchase in our Discord."
+              : "The vouch button becomes available after your order is marked completed."}
+          </p>
+        </div>
+        {!vouchLoading && !existingVouch ? (
+          <button
+            className="btn"
+            type="button"
+            disabled={!orderCompleted}
+            title={!orderCompleted ? "Available after the order is completed" : "Leave a vouch"}
+            onClick={() => setVouchOpen(value => !value)}
+          >
+            {vouchOpen ? "Cancel Vouch" : "Leave a Vouch"}
+          </button>
+        ) : null}
+      </div>
+
+      {vouchLoading ? <div className="muted" style={{ marginTop: 10 }}>Checking vouch status…</div> : null}
+
+      {existingVouch ? (
+        <div className="notice" style={{ marginTop: 12 }}>
+          <b>Your vouch: {existingVouch.rating}/5</b>
+          <p style={{ margin: "6px 0" }}>{existingVouch.feedback}</p>
+          <div className="muted">
+            {existingVouch.discord_status === "sent"
+              ? "Published to Discord."
+              : existingVouch.discord_status === "sending"
+                ? "Publishing to Discord…"
+                : "Saved, but not published to Discord yet."}
+          </div>
+          {existingVouch.discord_status !== "sent" ? (
+            <button className="btn secondary" type="button" style={{ marginTop: 10 }} disabled={vouchBusy} onClick={() => void postVouchToDiscord(existingVouch.id)}>
+              {vouchBusy ? "Publishing…" : "Retry Discord Post"}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {vouchOpen && !existingVouch && orderCompleted ? (
+        <form onSubmit={submitVouch} style={{ display: "grid", gap: 10, marginTop: 12 }}>
+          <label className="muted">
+            Discord username
+            <input className="input" style={{ width: "100%", marginTop: 6 }} maxLength={80} placeholder="e.g. Aramo" value={vouchDiscordTag} onChange={event => setVouchDiscordTag(event.target.value)} />
+          </label>
+          <div>
+            <div className="muted" style={{ marginBottom: 7 }}>Rating</div>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+              {[1, 2, 3, 4, 5].map(rating => (
+                <button key={rating} className={vouchRating === rating ? "btn" : "btn secondary"} type="button" aria-pressed={vouchRating === rating} onClick={() => setVouchRating(rating)}>
+                  {rating} ★
+                </button>
+              ))}
+            </div>
+          </div>
+          <label className="muted">
+            Feedback
+            <textarea className="input" style={{ width: "100%", marginTop: 6 }} rows={3} maxLength={1000} placeholder="Tell everyone about your purchase…" value={vouchFeedback} onChange={event => setVouchFeedback(event.target.value)} />
+          </label>
+          <button className="btn" type="submit" disabled={vouchBusy || vouchLoading}>
+            {vouchBusy ? "Submitting…" : "Submit Vouch"}
+          </button>
+        </form>
+      ) : null}
+      {vouchMessage ? <div className="muted" role="status" style={{ marginTop: 9 }}>{vouchMessage}</div> : null}
+    </div>
+  ) : null;
+
   if (!conversationId && !isAdmin) {
     return (
       <div style={{ marginTop: 16 }}>
@@ -289,6 +397,7 @@ export default function OrderSupportChat({
         </button>
         <p className="muted" style={{ marginTop: 7 }}>After you send payment, click this to notify the store and open your private order chat.</p>
         {message ? <div className="notice" role="status" style={{ marginTop: 8 }}>{message}</div> : null}
+        {vouchPanel}
       </div>
     );
   }
@@ -300,7 +409,14 @@ export default function OrderSupportChat({
           <b>1-on-1 order chat</b>
           <div className="muted">Order {orderNumber}{customerEmail ? " · " + customerEmail : ""}</div>
         </div>
-        <span className="pill">{conversationStatus === "closed" ? "Closed" : "Open"} · Private</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span className="pill">{conversationStatus === "closed" ? "Closed" : "Open"} · Private</span>
+          {!isAdmin ? (
+            <button className="btn secondary" type="button" disabled={deletingTicket} onClick={() => void deleteTicket()}>
+              {deletingTicket ? "Deleting…" : "Delete Ticket"}
+            </button>
+          ) : null}
+        </div>
       </div>
       <div
         aria-live="polite"
@@ -328,69 +444,7 @@ export default function OrderSupportChat({
       )}
       {message ? <div className="muted" role="status" style={{ marginTop: 8 }}>{message}</div> : null}
       <p className="muted" style={{ marginTop: 8 }}>Messages are visible only to this customer and authorized store staff.</p>
-      {canVouch && !isAdmin ? (
-        <div style={{ marginTop: 18, borderTop: "1px solid #393940", paddingTop: 16 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <div>
-              <b>Marketplace vouch</b>
-              <p className="muted" style={{ margin: "5px 0 0" }}>Your order is completed. Leave feedback to be posted as a verified purchase in our Discord.</p>
-            </div>
-            {!vouchLoading && !existingVouch ? (
-              <button className="btn" type="button" onClick={() => setVouchOpen(value => !value)}>
-                {vouchOpen ? "Cancel Vouch" : "Leave a Vouch"}
-              </button>
-            ) : null}
-          </div>
-
-          {vouchLoading ? <div className="muted" style={{ marginTop: 10 }}>Checking vouch status…</div> : null}
-
-          {existingVouch ? (
-            <div className="notice" style={{ marginTop: 12 }}>
-              <b>Your vouch: {existingVouch.rating}/5</b>
-              <p style={{ margin: "6px 0" }}>{existingVouch.feedback}</p>
-              <div className="muted">
-                {existingVouch.discord_status === "sent"
-                  ? "Published to Discord."
-                  : existingVouch.discord_status === "sending"
-                    ? "Publishing to Discord…"
-                    : "Saved, but not published to Discord yet."}
-              </div>
-              {existingVouch.discord_status !== "sent" ? (
-                <button className="btn secondary" type="button" style={{ marginTop: 10 }} disabled={vouchBusy} onClick={() => void postVouchToDiscord(existingVouch.id)}>
-                  {vouchBusy ? "Publishing…" : "Retry Discord Post"}
-                </button>
-              ) : null}
-            </div>
-          ) : null}
-
-          {vouchOpen && !existingVouch ? (
-            <form onSubmit={submitVouch} style={{ display: "grid", gap: 10, marginTop: 12 }}>
-              <label className="muted">
-                Discord username
-                <input className="input" style={{ width: "100%", marginTop: 6 }} maxLength={80} placeholder="e.g. Aramo" value={vouchDiscordTag} onChange={event => setVouchDiscordTag(event.target.value)} />
-              </label>
-              <div>
-                <div className="muted" style={{ marginBottom: 7 }}>Rating</div>
-                <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-                  {[1, 2, 3, 4, 5].map(rating => (
-                    <button key={rating} className={vouchRating === rating ? "btn" : "btn secondary"} type="button" aria-pressed={vouchRating === rating} onClick={() => setVouchRating(rating)}>
-                      {rating} ★
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <label className="muted">
-                Feedback
-                <textarea className="input" style={{ width: "100%", marginTop: 6 }} rows={3} maxLength={1000} placeholder="Tell everyone about your purchase…" value={vouchFeedback} onChange={event => setVouchFeedback(event.target.value)} />
-              </label>
-              <button className="btn" type="submit" disabled={vouchBusy || vouchLoading}>
-                {vouchBusy ? "Submitting…" : "Submit Vouch"}
-              </button>
-            </form>
-          ) : null}
-          {vouchMessage ? <div className="muted" role="status" style={{ marginTop: 9 }}>{vouchMessage}</div> : null}
-        </div>
-      ) : null}
+      {vouchPanel}
     </section>
   );
 }

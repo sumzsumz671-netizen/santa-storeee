@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
+import AdminSupportInbox from "../../components/AdminSupportInbox";
 
 type Product = {
   id: string; name: string; slug: string; description: string | null;
@@ -216,6 +217,8 @@ export default function Admin() {
           </div>
 
           {message ? <div className="notice" role="status" style={{ marginTop: 18 }}>{message}</div> : null}
+
+          <AdminSupportInbox />
 
           <div style={{ marginTop: 38 }}>
             <h2 style={{ fontSize: 25 }}>Add a product</h2>

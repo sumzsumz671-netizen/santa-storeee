@@ -1,1 +1,1 @@
-Production deploy marker: explain why the customer vouch action is locked until order completion.
+Production deploy marker: add admin action to mark a customer order completed from the support inbox.

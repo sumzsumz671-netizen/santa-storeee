@@ -37,6 +37,7 @@ export default function BuyWithBalance({
     }
 
     const result = data as {
+      order_id?: string;
       order_number?: string;
       balance_cents?: number;
     };
@@ -47,6 +48,29 @@ export default function BuyWithBalance({
           ? " · Remaining balance $" + (result.balance_cents / 100).toFixed(2)
           : "")
     );
+
+    if (result.order_id) {
+      void (async () => {
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const accessToken = sessionData.session?.access_token;
+          if (!accessToken) return;
+          const alertResponse = await fetch("/api/discord-new-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + accessToken,
+            },
+            body: JSON.stringify({ orderId: result.order_id }),
+          });
+          if (!alertResponse.ok) {
+            console.warn("Sumz Market order alert was not delivered to Discord.", await alertResponse.text());
+          }
+        } catch (alertError) {
+          console.warn("Sumz Market order alert could not reach Discord.", alertError);
+        }
+      })();
+    }
   }
 
   return (

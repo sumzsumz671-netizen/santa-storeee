@@ -80,12 +80,26 @@ export default async function Home() {
     .order("sort_order", { ascending: true });
 
   const products = (data ?? []) as Product[];
-  const groupedProducts = inventoryGroups
-    .map(group => ({
+  const configuredCategories = new Set(inventoryGroups.map(group => group.category));
+  const additionalCategories = [...new Set(
+    products
+      .map(product => product.category?.trim() || "Uncategorized")
+      .filter(category => !configuredCategories.has(category))
+  )];
+
+  const groupedProducts = [
+    ...inventoryGroups.map(group => ({
       ...group,
       products: products.filter(product => product.category === group.category),
-    }))
-    .filter(group => group.products.length > 0);
+    })),
+    ...additionalCategories.map(category => ({
+      category,
+      title: category,
+      subtitle: "More listings available at Sumz Market",
+      accent: "purple",
+      products: products.filter(product => (product.category?.trim() || "Uncategorized") === category),
+    })),
+  ].filter(group => group.products.length > 0);
 
   return (
     <>

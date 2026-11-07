@@ -36,6 +36,7 @@ export default function AdminSupportInbox() {
   const [message, setMessage] = useState("");
   const [statusBusy, setStatusBusy] = useState("");
   const [orderBusy, setOrderBusy] = useState("");
+  const [refundBusy, setRefundBusy] = useState("");
 
   const loadInbox = useCallback(async () => {
     setLoading(true);
@@ -117,6 +118,31 @@ export default function AdminSupportInbox() {
       : item
     ));
     setMessage("Order " + order.order_number + " marked Completed. The customer can now leave a verified vouch.");
+  }
+
+  async function refundOrderToBalance(order: Order) {
+    if (!["paid", "processing", "completed"].includes(order.status)) return;
+    if (!window.confirm("Refund " + money(order.total_cents) + " to this customer's store balance? This cannot be undone.")) return;
+
+    setRefundBusy(order.id);
+    setMessage("");
+    const { data, error } = await supabase.rpc("refund_order_to_balance", {
+      p_order_id: order.id,
+      p_note: "Admin refund for order " + order.order_number,
+    });
+    setRefundBusy("");
+
+    if (error) {
+      setMessage("Refund failed: " + error.message);
+      return;
+    }
+
+    const result = data as { refunded_cents?: number };
+    setItems(current => current.map(item => item.order?.id === order.id
+      ? { ...item, order: { ...item.order, status: "refunded" } }
+      : item
+    ));
+    setMessage("Refunded " + money(Number(result?.refunded_cents ?? order.total_cents)) + " to the customer's store balance.");
   }
 
   async function deleteTicketForBoth(conversationId: string) {
@@ -271,6 +297,18 @@ export default function AdminSupportInbox() {
                   ) : (
                     <span className="pill" style={{ alignSelf: "center" }}>Order Completed</span>
                   )}
+                  {["paid", "processing", "completed"].includes(selected.order.status) ? (
+                    <button
+                      className="btn secondary"
+                      type="button"
+                      disabled={refundBusy === selected.order.id || orderBusy === selected.order.id}
+                      onClick={() => void refundOrderToBalance(selected.order!)}
+                    >
+                      {refundBusy === selected.order.id ? "Refunding…" : "Refund to balance"}
+                    </button>
+                  ) : selected.order.status === "refunded" ? (
+                    <span className="pill" style={{ alignSelf: "center" }}>Refunded to balance</span>
+                  ) : null}
                   {selected.conversation.status === "open" ? (
                     <button
                       className="btn secondary"

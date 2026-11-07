@@ -1,1 +1,1 @@
-Production deploy marker: add admin action to mark a customer order completed from the support inbox.
+Production deployment marker: update all storefront Discord invite links to the Sumz invite.

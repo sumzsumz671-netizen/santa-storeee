@@ -1,6 +1,5 @@
 import { supabase } from "../lib/supabase";
-import BuyWithBalance from "../components/BuyWithBalance";
-import ManualCheckout from "../components/ManualCheckout";
+import InventorySearch from "../components/InventorySearch";
 
 export const dynamic = "force-dynamic";
 
@@ -60,58 +59,6 @@ const inventoryGroups = [
     accent: "pink",
   },
 ];
-
-function ProductCard({ product }: { product: Product }) {
-  const isFA = product.category === "Fortnite FA Accounts";
-  const soldOut = product.stock_count === 0;
-  const stockText = product.stock_count === null
-    ? (product.stock_label ?? "Stock not listed")
-    : product.stock_count === 1
-      ? "1 in stock"
-      : product.stock_count.toLocaleString() + " in stock";
-
-  return (
-    <article className="market-product" key={product.id}>
-      <div className="market-product-art">
-        <div className="market-product-glow" />
-        <span className="market-product-emoji">{product.emoji || "🎁"}</span>
-        <span className="market-product-badge">{product.badge || product.category || "Digital item"}</span>
-      </div>
-      <div className="market-product-body">
-        <h3>{product.name}</h3>
-        {product.description ? <p className="muted market-product-description">{product.description}</p> : null}
-
-        {isFA ? (
-          <div className="market-price-options">
-            <div className="market-price-option">
-              <span>No Warranty</span>
-              <strong>{money(product.price_cents)}</strong>
-            </div>
-            <div className="market-price-option market-price-option-featured">
-              <span>With Warranty</span>
-              <strong>{product.warranty_price_cents === null ? "—" : money(product.warranty_price_cents)}</strong>
-            </div>
-          </div>
-        ) : (
-          <div className="market-product-price">{money(product.price_cents)}</div>
-        )}
-
-        <div className="market-stock">
-          <span className={"market-stock-dot" + (soldOut ? " is-sold-out" : "")} />
-          <span>{soldOut ? "Out of stock" : stockText}</span>
-        </div>
-        {soldOut ? (
-          <div className="market-sold-out">Currently unavailable</div>
-        ) : (
-          <div className="market-buy-actions">
-            <BuyWithBalance productId={product.id} warrantyPriceCents={product.warranty_price_cents} />
-            <ManualCheckout productId={product.id} productName={product.name} priceCents={product.price_cents} warrantyPriceCents={product.warranty_price_cents} />
-          </div>
-        )}
-      </div>
-    </article>
-  );
-}
 
 function Feature({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
@@ -179,7 +126,11 @@ export default async function Home() {
             <div className="market-orbit market-orbit-one" />
             <div className="market-orbit market-orbit-two" />
             <div className="market-crown-halo" />
-            <div className="market-crown">♛</div>
+            <img
+              className="market-hero-character"
+              src="/images/sumz-hero-skeleton.svg"
+              alt="Purple-lit skeleton character artwork from the Sumz Market theme"
+            />
             <div className="market-floating-card market-floating-top"><span>✦</span><div><b>Premium drops</b><small>New stock, ready to shop</small></div></div>
             <div className="market-floating-card market-floating-bottom"><span>⚡</span><div><b>Instant checkout</b><small>Secure order processing</small></div></div>
             <div className="market-visual-caption">SUMZ MARKET <span>✦ EST. 2021</span></div>
@@ -217,23 +168,7 @@ export default async function Home() {
               <a className="market-discord-button" href="https://discord.com/invite/sumz" target="_blank" rel="noopener noreferrer">Join our Discord ↗</a>
             </div>
           ) : (
-            <div className="market-inventory-groups">
-              {groupedProducts.map(group => (
-                <section className="market-inventory-group" id={group.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")} key={group.category}>
-                  <div className="market-group-heading">
-                    <div>
-                      <span className="market-group-count">{String(group.products.length).padStart(2, "0")} LISTINGS</span>
-                      <h3>{group.title}</h3>
-                      <p>{group.subtitle}</p>
-                    </div>
-                    <span className="market-group-arrow">↘</span>
-                  </div>
-                  <div className="market-product-grid">
-                    {group.products.map(product => <ProductCard product={product} key={product.id} />)}
-                  </div>
-                </section>
-              ))}
-            </div>
+            <InventorySearch groups={groupedProducts} />
           )}
         </section>
 

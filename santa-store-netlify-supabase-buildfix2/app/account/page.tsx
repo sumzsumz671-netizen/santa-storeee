@@ -260,7 +260,8 @@ export default function Account() {
                       orderId={order.id}
                       orderNumber={order.order_number}
                       initialConversationId={conversationsByOrder[order.id] ?? null}
-                      canVouch={order.status === "completed"}
+                      canVouch={!["cancelled", "refunded"].includes(order.status)}
+                      orderCompleted={order.status === "completed"}
                     />
                   ) : null}
                 </article>

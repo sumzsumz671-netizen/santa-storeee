@@ -430,3 +430,36 @@ button, input, select, textarea { font: inherit; }
   .market-search-shortcut { display:none; }
   .market-product-image { width:92%; height:90px; }
 }
+
+
+.market-product-image-stack {
+  position: relative;
+  z-index: 1;
+  width: 92%;
+  height: 108px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px;
+}
+.market-product-image-stack img {
+  display: block;
+  width: calc(100% / 3);
+  max-width: 112px;
+  height: 96px;
+  min-width: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 14px rgba(168,85,247,.30));
+}
+.market-product-fallback {
+  width: 100%;
+  height: 108px;
+  padding: 8px;
+  object-fit: contain;
+}
+@media(max-width:650px) {
+  .market-product-image-stack { height: 90px; gap: 2px; padding: 3px; }
+  .market-product-image-stack img { height: 82px; }
+  .market-product-fallback { height: 90px; }
+}

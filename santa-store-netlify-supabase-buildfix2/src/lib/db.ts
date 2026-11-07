@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
-export const db = globalForPrisma.prisma ?? new PrismaClient();
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+// Prisma is not configured in this storefront. Keep this module dependency-free
+// so TypeScript does not require a generated Prisma client during Netlify builds.
+export const db = null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 type ChatMessage = {
@@ -8,6 +8,11 @@ type ChatMessage = {
   sender_id: string;
   body: string;
   created_at: string;
+  attachment_path: string | null;
+  attachment_name: string | null;
+  attachment_mime_type: string | null;
+  attachment_size_bytes: number | null;
+  attachment_url?: string | null;
 };
 
 export default function OrderSupportChat({
@@ -32,6 +37,8 @@ export default function OrderSupportChat({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentUserId, setCurrentUserId] = useState("");
   const [draft, setDraft] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -145,12 +152,31 @@ export default function OrderSupportChat({
     setLoading(true);
     const { data, error } = await supabase
       .from("chat_messages")
-      .select("id,sender_id,body,created_at")
+      .select("id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size_bytes")
       .eq("conversation_id", conversationId)
       .order("created_at", { ascending: true });
+
+    if (error) {
+      setLoading(false);
+      setMessage(error.message);
+      return;
+    }
+
+    const withSignedUrls = await Promise.all(
+      ((data ?? []) as ChatMessage[]).map(async item => {
+        if (!item.attachment_path) return item;
+        const { data: signed, error: signedError } = await supabase.storage
+          .from("support-attachments")
+          .createSignedUrl(item.attachment_path, 60 * 60);
+        return {
+          ...item,
+          attachment_url: signedError ? null : signed?.signedUrl ?? null,
+        };
+      })
+    );
+
     setLoading(false);
-    if (error) setMessage(error.message);
-    else setMessages((data ?? []) as ChatMessage[]);
+    setMessages(withSignedUrls);
   }, [conversationId]);
 
   useEffect(() => {
@@ -217,6 +243,33 @@ export default function OrderSupportChat({
 
     setDeletingTicket(true);
     setMessage("");
+
+    const { data: attachmentRows, error: attachmentReadError } = await supabase
+      .from("chat_messages")
+      .select("attachment_path")
+      .eq("conversation_id", conversationId);
+
+    if (attachmentReadError) {
+      setDeletingTicket(false);
+      setMessage("Could not prepare ticket deletion: " + attachmentReadError.message);
+      return;
+    }
+
+    const attachmentPaths = (attachmentRows ?? [])
+      .map(row => row.attachment_path as string | null)
+      .filter((value): value is string => !!value);
+
+    if (attachmentPaths.length) {
+      const { error: removeError } = await supabase.storage
+        .from("support-attachments")
+        .remove(attachmentPaths);
+      if (removeError) {
+        setDeletingTicket(false);
+        setMessage("Could not delete ticket attachments: " + removeError.message);
+        return;
+      }
+    }
+
     const { data, error } = await supabase
       .from("support_conversations")
       .delete()
@@ -335,7 +388,29 @@ export default function OrderSupportChat({
   async function sendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const body = draft.trim();
-    if (!body || !conversationId) return;
+    if ((!body && selectedFiles.length === 0) || !conversationId) return;
+
+    const allowedTypes = new Set([
+      "image/jpeg", "image/png", "image/webp", "image/gif",
+      "video/mp4", "video/webm", "video/quicktime",
+    ]);
+    const maxFileSize = 25 * 1024 * 1024;
+
+    if (selectedFiles.length > 5) {
+      setMessage("You can attach up to 5 files per message.");
+      return;
+    }
+    for (const file of selectedFiles) {
+      if (!allowedTypes.has(file.type)) {
+        setMessage("Only JPG, PNG, WEBP, GIF, MP4, WEBM, and MOV files are supported.");
+        return;
+      }
+      if (file.size > maxFileSize) {
+        setMessage("Each attachment must be 25 MB or smaller: " + file.name);
+        return;
+      }
+    }
+
     setBusy(true);
     setMessage("");
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -344,16 +419,67 @@ export default function OrderSupportChat({
       setMessage("Please sign in again to send a message.");
       return;
     }
-    const { error } = await supabase.from("chat_messages").insert({
-      conversation_id: conversationId,
-      sender_id: authData.user.id,
-      body,
-    });
-    setBusy(false);
-    if (error) setMessage(error.message);
-    else {
+
+    if (selectedFiles.length === 0) {
+      const { error } = await supabase.from("chat_messages").insert({
+        conversation_id: conversationId,
+        sender_id: authData.user.id,
+        body,
+      });
+      setBusy(false);
+      if (error) setMessage(error.message);
+      else {
+        setDraft("");
+        await loadMessages();
+      }
+      return;
+    }
+
+    try {
+      for (let index = 0; index < selectedFiles.length; index++) {
+        const file = selectedFiles[index];
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100) || "attachment";
+        const storagePath = conversationId + "/" + authData.user.id + "/" + crypto.randomUUID() + "-" + safeName;
+
+        const { error: uploadError } = await supabase.storage
+          .from("support-attachments")
+          .upload(storagePath, file, {
+            cacheControl: "3600",
+            contentType: file.type,
+            upsert: false,
+          });
+
+        if (uploadError) throw new Error("Could not upload " + file.name + ": " + uploadError.message);
+
+        const messageBody = index === 0 && body
+          ? body
+          : "Shared an attachment: " + file.name;
+
+        const { error: insertError } = await supabase.from("chat_messages").insert({
+          conversation_id: conversationId,
+          sender_id: authData.user.id,
+          body: messageBody,
+          attachment_path: storagePath,
+          attachment_name: file.name.slice(0, 255),
+          attachment_mime_type: file.type,
+          attachment_size_bytes: file.size,
+        });
+
+        if (insertError) {
+          await supabase.storage.from("support-attachments").remove([storagePath]);
+          throw new Error("Could not save " + file.name + " to the chat: " + insertError.message);
+        }
+      }
+
       setDraft("");
+      setSelectedFiles([]);
+      if (uploadInputRef.current) uploadInputRef.current.value = "";
+      setMessage("Message and attachment(s) sent.");
       await loadMessages();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not send your attachment.");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -475,6 +601,38 @@ export default function OrderSupportChat({
           return (
             <div key={item.id} style={{ justifySelf: mine ? "end" : "start", maxWidth: "88%", background: mine ? "#3a151b" : "#222228", border: "1px solid #393940", borderRadius: 12, padding: "10px 12px" }}>
               <div style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{item.body}</div>
+              {item.attachment_path ? (
+                <div style={{ marginTop: 9, display: "grid", gap: 6 }}>
+                  {item.attachment_url && item.attachment_mime_type?.startsWith("image/") ? (
+                    <a href={item.attachment_url} target="_blank" rel="noopener noreferrer">
+                      <img
+                        src={item.attachment_url}
+                        alt={item.attachment_name ?? "Customer attachment"}
+                        style={{ display: "block", maxWidth: "100%", maxHeight: 260, borderRadius: 9, objectFit: "contain", background: "#08060d" }}
+                      />
+                    </a>
+                  ) : item.attachment_url && item.attachment_mime_type?.startsWith("video/") ? (
+                    <video
+                      src={item.attachment_url}
+                      controls
+                      preload="metadata"
+                      style={{ display: "block", width: "min(100%, 460px)", maxHeight: 280, borderRadius: 9, background: "#08060d" }}
+                    />
+                  ) : (
+                    <div className="muted">Attachment preview unavailable. Refresh the chat to try again.</div>
+                  )}
+                  {item.attachment_url ? (
+                    <a href={item.attachment_url} target="_blank" rel="noopener noreferrer" style={{ color: "#d8a8ff", fontSize: 12, textDecoration: "underline", overflowWrap: "anywhere" }}>
+                      {item.attachment_name ?? "Open attachment"}
+                    </a>
+                  ) : null}
+                  {typeof item.attachment_size_bytes === "number" ? (
+                    <span className="muted" style={{ fontSize: 10 }}>
+                      {(item.attachment_size_bytes / (1024 * 1024)).toFixed(2)} MB
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
               <div className="muted" style={{ fontSize: 10, marginTop: 6 }}>{mine ? (isAdmin ? "You · Staff" : "You") : (isAdmin ? "Customer" : "Sumz Market Support")} · {new Date(item.created_at).toLocaleString()}</div>
             </div>
           );
@@ -485,9 +643,55 @@ export default function OrderSupportChat({
           This ticket is closed. {isAdmin ? "Reopen the ticket from the admin inbox to send another message." : "Contact Sumz Market support if you need more help."}
         </div>
       ) : (
-        <form onSubmit={sendMessage} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, marginTop: 12 }}>
-          <textarea className="input" rows={2} maxLength={4000} placeholder={isAdmin ? "Reply to customer or send delivery details…" : "Message Sumz Market support…"} value={draft} onChange={event => setDraft(event.target.value)} />
-          <button className="btn" type="submit" disabled={busy || !draft.trim()}>{busy ? "Sending…" : "Send"}</button>
+        <form onSubmit={sendMessage} style={{ display: "grid", gap: 9, marginTop: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, alignItems: "stretch" }}>
+            <textarea
+              className="input"
+              rows={2}
+              maxLength={4000}
+              placeholder={isAdmin ? "Reply to customer or send delivery details…" : "Message Sumz Market support…"}
+              value={draft}
+              onChange={event => setDraft(event.target.value)}
+              disabled={busy}
+            />
+            <button className="btn" type="submit" disabled={busy || (!draft.trim() && selectedFiles.length === 0)}>
+              {busy ? "Sending…" : "Send"}
+            </button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <input
+              ref={uploadInputRef}
+              id={"support-attachments-" + orderId}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+              multiple
+              style={{ display: "none" }}
+              disabled={busy}
+              onChange={event => {
+                const incoming = Array.from(event.target.files ?? []);
+                setSelectedFiles(current => [...current, ...incoming].slice(0, 5));
+                event.target.value = "";
+              }}
+            />
+            <label
+              className="btn secondary"
+              htmlFor={"support-attachments-" + orderId}
+              style={{ cursor: busy ? "not-allowed" : "pointer", opacity: busy ? .6 : 1 }}
+            >
+              📎 Attach screenshots/videos
+            </label>
+            <span className="muted" style={{ fontSize: 11 }}>Up to 5 files · 25 MB each</span>
+          </div>
+          {selectedFiles.length ? (
+            <div style={{ display: "grid", gap: 6 }}>
+              {selectedFiles.map((file, index) => (
+                <div key={file.name + file.size + index} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "7px 9px", background: "#171021", border: "1px solid #3b2a4a", borderRadius: 8 }}>
+                  <span className="muted" style={{ overflowWrap: "anywhere" }}>{file.name} · {(file.size / (1024 * 1024)).toFixed(2)} MB</span>
+                  <button className="btn secondary" type="button" disabled={busy} onClick={() => setSelectedFiles(current => current.filter((_, i) => i !== index))}>Remove</button>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </form>
       )}
       {message ? <div className="muted" role="status" style={{ marginTop: 8 }}>{message}</div> : null}

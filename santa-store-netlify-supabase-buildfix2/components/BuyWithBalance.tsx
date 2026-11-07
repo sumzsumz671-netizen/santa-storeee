@@ -84,6 +84,9 @@ export default function BuyWithBalance({
       <button className="btn" type="button" style={{ width: "100%" }} disabled={busy} onClick={buy}>
         {busy ? "Processing…" : "Buy with store balance"}
       </button>
+      <p className="muted" style={{ margin: "9px 0 0", lineHeight: 1.5 }}>
+        By purchasing, you agree to our <a href="/terms" style={{ color: "#d8a8ff", textDecoration: "underline" }}>Terms of Service</a>.
+      </p>
       {message ? (
         <div className="muted" role="status" style={{ marginTop: 8, lineHeight: 1.5 }}>
           {message}{" "}

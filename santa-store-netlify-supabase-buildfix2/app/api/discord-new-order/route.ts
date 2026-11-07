@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+// Sends new website checkout alerts to the private Discord order-log webhook configured in Netlify.\nimport { createClient } from "@supabase/supabase-js";
 
 type OrderItem = {
   product_name: string;

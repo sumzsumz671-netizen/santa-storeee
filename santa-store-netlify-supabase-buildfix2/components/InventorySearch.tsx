@@ -38,20 +38,20 @@ const COSMETIC_ALIASES: Record<string, string> = {
   "dark skully": "Dark Skully",
 };
 
-function productCosmeticName(product: Product): string | null {
+function productCosmeticNames(product: Product): string[] {
   const original = product.name.trim();
-  if (/^OG Save The World$/i.test(original)) return null;
+  if (/^OG Save The World$/i.test(original)) return [];
 
-  const base = original
-    .replace(/^OG\s+/i, "")
-    .replace(/\s+FA$/i, "")
-    .split(" + ")[0]
-    .trim();
+  const cleaned = original.replace(/\s+FA$/i, "");
+  const parts = cleaned.split(/\s+\+\s+/);
+  const names = parts
+    .map(part => part.replace(/^OG\s+/i, "").replace(/\s+Stacked$/i, "").trim())
+    .filter(part => part.length > 0)
+    .filter(part => !/(inactive|last match|days ago|^stw$|save the world)/i.test(part))
+    .filter(part => !/\b(v[- ]?bucks|skins?)\b/i.test(part))
+    .map(part => COSMETIC_ALIASES[part.toLowerCase()] ?? part);
 
-  if (/\b(v[- ]?bucks|skins?)\b/i.test(base)) return null;
-
-  const key = base.toLowerCase();
-  return COSMETIC_ALIASES[key] ?? base;
+  return [...new Set(names)].slice(0, 4);
 }
 
 function fallbackProductImage(product: Product) {
@@ -70,8 +70,11 @@ function fallbackProductImage(product: Product) {
 function ProductCard({ product, cosmeticImages }: { product: Product; cosmeticImages: Record<string, string> }) {
   const isFA = product.category === "Fortnite FA Accounts";
   const soldOut = product.stock_count === 0;
-  const cosmeticName = productCosmeticName(product);
-  const image = (cosmeticName ? cosmeticImages[cosmeticName] : null) || fallbackProductImage(product);
+  const productImages = productCosmeticNames(product)
+    .map(name => cosmeticImages[name])
+    .filter((url): url is string => !!url)
+    .slice(0, 3);
+  const fallbackImage = fallbackProductImage(product);
   const stockText = product.stock_count === null
     ? (product.stock_label ?? "Stock not listed")
     : product.stock_count === 1
@@ -82,10 +85,18 @@ function ProductCard({ product, cosmeticImages }: { product: Product; cosmeticIm
     <article className="market-product" key={product.id}>
       <div className={"market-product-art" + (image ? " has-product-image" : "")}>
         <div className="market-product-glow" />
-        {image ? (
-          <img className="market-product-image" src={image} alt={product.name} loading="lazy" />
+        {productImages.length > 0 ? (
+          productImages.length === 1 ? (
+            <img className="market-product-image" src={productImages[0]} alt={product.name} loading="lazy" />
+          ) : (
+            <div className="market-product-image-stack">
+              {productImages.map((imageUrl, index) => (
+                <img key={imageUrl} src={imageUrl} alt={product.name + " item " + (index + 1)} loading="lazy" />
+              ))}
+            </div>
+          )
         ) : (
-          <span className="market-product-emoji">{product.emoji || "🎁"}</span>
+          <img className="market-product-image market-product-fallback" src={fallbackImage} alt={product.name} loading="lazy" />
         )}
         <span className="market-product-badge">{product.badge || product.category || "Digital item"}</span>
       </div>
@@ -129,7 +140,7 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
   const [query, setQuery] = useState("");
   const [cosmeticImages, setCosmeticImages] = useState<Record<string, string>>({});
   const cosmeticNames = useMemo(
-    () => [...new Set(groups.flatMap(group => group.products.map(productCosmeticName).filter((name): name is string => !!name)))],
+    () => [...new Set(groups.flatMap(group => group.products.flatMap(productCosmeticNames)))],
     [groups]
   );
 

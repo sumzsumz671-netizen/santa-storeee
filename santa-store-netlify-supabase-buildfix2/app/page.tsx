@@ -1,6 +1,8 @@
 import {supabase} from "../lib/supabase";
 import BuyWithBalance from "../components/BuyWithBalance";
 import ManualCheckout from "../components/ManualCheckout";
+
+export const dynamic = "force-dynamic";
 type Product={id:string;name:string;description:string|null;price_cents:number;price_max_cents:number|null;category:string|null;stock_label:string|null;badge:string|null;emoji:string|null;active:boolean};
 const money=(c:number)=>"$"+(c/100).toFixed(2);
 export default async function Home(){

@@ -1,0 +1,8 @@
+{
+  "name": "santa-store-netlify-root",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm --prefix santa-store-netlify-supabase-buildfix2 install && npm --prefix santa-store-netlify-supabase-buildfix2 run build"
+  }
+}

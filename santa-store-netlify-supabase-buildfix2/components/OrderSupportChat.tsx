@@ -330,9 +330,15 @@ export default function OrderSupportChat({
           <button
             className="btn"
             type="button"
-            disabled={!orderCompleted}
             title={!orderCompleted ? "Available after the order is completed" : "Leave a vouch"}
-            onClick={() => setVouchOpen(value => !value)}
+            onClick={() => {
+              if (!orderCompleted) {
+                setVouchMessage("Your vouch unlocks after Sumz Market marks this order as Completed.");
+                return;
+              }
+              setVouchMessage("");
+              setVouchOpen(value => !value);
+            }}
           >
             {vouchOpen ? "Cancel Vouch" : "Leave a Vouch"}
           </button>

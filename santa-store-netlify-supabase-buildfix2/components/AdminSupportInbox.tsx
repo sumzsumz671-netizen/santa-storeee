@@ -35,6 +35,7 @@ export default function AdminSupportInbox() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [statusBusy, setStatusBusy] = useState("");
+  const [orderBusy, setOrderBusy] = useState("");
 
   const loadInbox = useCallback(async () => {
     setLoading(true);
@@ -87,6 +88,36 @@ export default function AdminSupportInbox() {
   }, [loadInbox]);
 
   const selected = items.find(item => item.conversation.id === selectedId);
+
+  async function markOrderCompleted(order: Order) {
+    if (order.status === "completed") return;
+    if (!window.confirm("Mark order " + order.order_number + " as Completed? This will unlock the customer's verified vouch form.")) return;
+
+    setOrderBusy(order.id);
+    setMessage("");
+    const { data, error } = await supabase
+      .from("orders")
+      .update({ status: "completed", updated_at: new Date().toISOString() })
+      .eq("id", order.id)
+      .select("id,status")
+      .maybeSingle();
+    setOrderBusy("");
+
+    if (error) {
+      setMessage("Could not mark order completed: " + error.message);
+      return;
+    }
+    if (!data) {
+      setMessage("Order was not updated. Check that your account has staff/admin permissions.");
+      return;
+    }
+
+    setItems(current => current.map(item => item.order?.id === order.id
+      ? { ...item, order: { ...item.order, status: "completed" } }
+      : item
+    ));
+    setMessage("Order " + order.order_number + " marked Completed. The customer can now leave a verified vouch.");
+  }
 
   async function changeTicketStatus(conversationId: string, nextStatus: "open" | "closed") {
     setStatusBusy(conversationId);
@@ -170,6 +201,18 @@ export default function AdminSupportInbox() {
                     : "Customer has not clicked I Have Paid yet."}
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+                  {selected.order.status !== "completed" ? (
+                    <button
+                      className="btn"
+                      type="button"
+                      disabled={orderBusy === selected.order.id}
+                      onClick={() => void markOrderCompleted(selected.order!)}
+                    >
+                      {orderBusy === selected.order.id ? "Marking Completed…" : "Mark Order Completed"}
+                    </button>
+                  ) : (
+                    <span className="pill" style={{ alignSelf: "center" }}>Order Completed</span>
+                  )}
                   {selected.conversation.status === "open" ? (
                     <button
                       className="btn secondary"

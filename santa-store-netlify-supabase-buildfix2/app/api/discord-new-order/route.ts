@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   const authorization = request.headers.get("authorization") ?? "";
-  const accessToken = authorization.match(/^Bearer\\s+(.+)$/i)?.[1];
+  const accessToken = authorization.match(/^Bearer\s+(.+)$/i)?.[1];
   if (!accessToken) {
     return Response.json({ error: "Please sign in before sending an order alert." }, { status: 401 });
   }
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
     const lineTotal = (item.unit_price_cents * item.quantity / 100).toFixed(2);
     return item.product_name + " × " + item.quantity + " — $" + lineTotal;
   });
-  const itemSummary = items.join("\\n").slice(0, 900) || "Order details unavailable";
+  const itemSummary = items.join("\n").slice(0, 900) || "Order details unavailable";
   const customer = authData.user.email ?? "Customer email unavailable";
   const placedAt = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Chicago",
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: "Sumz Market Order Alerts",
-        content: "🛒 **NEW WEBSITE ORDER — CHECK SUMZ MARKET!**\\nA customer just placed an order from the website.\\nAdmin panel: https://sumz.store/admin\\n<#1533089638548377812>",
+        content: "🛒 **NEW WEBSITE ORDER — CHECK SUMZ MARKET!**\nA customer just placed an order from the website.\nAdmin panel: https://sumz.store/admin\n<#1533089638548377812>",
         embeds: [{
           color: 0xa855f7,
           title: "New website order",

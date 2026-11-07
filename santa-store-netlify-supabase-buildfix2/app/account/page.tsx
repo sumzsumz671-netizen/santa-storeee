@@ -255,7 +255,7 @@ export default function Account() {
                   <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #303036", marginTop: 10, paddingTop: 12 }}>
                     <b>Total</b><b>{money(order.total_cents)}</b>
                   </div>
-                  {order.payment_method !== "store_balance" && (order.status === "pending_payment" || conversationsByOrder[order.id]) ? (
+                  {(!["cancelled", "refunded"].includes(order.status) || conversationsByOrder[order.id]) ? (
                     <OrderSupportChat
                       orderId={order.id}
                       orderNumber={order.order_number}

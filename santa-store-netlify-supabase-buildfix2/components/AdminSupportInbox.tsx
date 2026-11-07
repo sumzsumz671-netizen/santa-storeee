@@ -119,6 +119,37 @@ export default function AdminSupportInbox() {
     setMessage("Order " + order.order_number + " marked Completed. The customer can now leave a verified vouch.");
   }
 
+  async function deleteTicketForBoth(conversationId: string) {
+    const target = items.find(item => item.conversation.id === conversationId);
+    const orderLabel = target?.order?.order_number ?? "this ticket";
+    if (!window.confirm("Delete " + orderLabel + " for both the customer and store staff? All chat messages will be permanently removed.")) return;
+
+    setStatusBusy(conversationId);
+    setMessage("");
+    const { data, error } = await supabase
+      .from("support_conversations")
+      .delete()
+      .eq("id", conversationId)
+      .select("id")
+      .maybeSingle();
+    setStatusBusy("");
+
+    if (error) {
+      setMessage("Could not delete ticket for both users: " + error.message);
+      return;
+    }
+    if (!data) {
+      setMessage("Ticket was already deleted or could not be found.");
+      await loadInbox();
+      return;
+    }
+
+    const remaining = items.filter(item => item.conversation.id !== conversationId);
+    setItems(remaining);
+    setSelectedId(remaining[0]?.conversation.id ?? "");
+    setMessage("Ticket and its messages were deleted for both the customer and store staff.");
+  }
+
   async function changeTicketStatus(conversationId: string, nextStatus: "open" | "closed") {
     setStatusBusy(conversationId);
     setMessage("");
@@ -232,6 +263,15 @@ export default function AdminSupportInbox() {
                       {statusBusy === selected.conversation.id ? "Reopening…" : "Reopen Ticket"}
                     </button>
                   )}
+                  <button
+                    className="btn secondary"
+                    type="button"
+                    style={{ borderColor: "#7f1d1d", color: "#fca5a5" }}
+                    disabled={statusBusy === selected.conversation.id}
+                    onClick={() => void deleteTicketForBoth(selected.conversation.id)}
+                  >
+                    {statusBusy === selected.conversation.id ? "Deleting…" : "Delete Ticket for Both"}
+                  </button>
                 </div>
               </div>
               <OrderSupportChat

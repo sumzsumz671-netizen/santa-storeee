@@ -24,6 +24,7 @@ export default function OrderSupportChat({
   customerEmail?: string;
 }) {
   const [conversationId, setConversationId] = useState<string | null>(initialConversationId ?? null);
+  const [conversationStatus, setConversationStatus] = useState<"open" | "closed">("open");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentUserId, setCurrentUserId] = useState("");
   const [draft, setDraft] = useState("");
@@ -34,6 +35,43 @@ export default function OrderSupportChat({
   useEffect(() => {
     setConversationId(initialConversationId ?? null);
   }, [initialConversationId]);
+
+  useEffect(() => {
+    if (!conversationId) {
+      setConversationStatus("open");
+      return;
+    }
+
+    let active = true;
+    const loadConversationStatus = async () => {
+      const { data, error } = await supabase
+        .from("support_conversations")
+        .select("status")
+        .eq("id", conversationId)
+        .maybeSingle();
+      if (active && !error && data) {
+        setConversationStatus(data.status === "closed" ? "closed" : "open");
+      }
+    };
+
+    void loadConversationStatus();
+    const channel = supabase
+      .channel("order-chat-status-" + conversationId)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "support_conversations", filter: "id=eq." + conversationId },
+        payload => {
+          const row = payload.new as { status?: string };
+          setConversationStatus(row.status === "closed" ? "closed" : "open");
+        }
+      )
+      .subscribe();
+
+    return () => {
+      active = false;
+      void supabase.removeChannel(channel);
+    };
+  }, [conversationId]);
 
   const loadMessages = useCallback(async () => {
     if (!conversationId) return;
@@ -122,7 +160,7 @@ export default function OrderSupportChat({
           <b>1-on-1 order chat</b>
           <div className="muted">Order {orderNumber}{customerEmail ? " · " + customerEmail : ""}</div>
         </div>
-        <span className="pill">Private</span>
+        <span className="pill">{conversationStatus === "closed" ? "Closed" : "Open"} · Private</span>
       </div>
       <div
         aria-live="polite"
@@ -138,10 +176,16 @@ export default function OrderSupportChat({
           );
         })}
       </div>
-      <form onSubmit={sendMessage} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, marginTop: 12 }}>
-        <textarea className="input" rows={2} maxLength={4000} placeholder={isAdmin ? "Reply to customer or send delivery details…" : "Message Sumz Market support…"} value={draft} onChange={event => setDraft(event.target.value)} />
-        <button className="btn" type="submit" disabled={busy || !draft.trim()}>{busy ? "Sending…" : "Send"}</button>
-      </form>
+{conversationStatus === "closed" ? (
+        <div className="notice" role="status" style={{ marginTop: 12 }}>
+          This ticket is closed. {isAdmin ? "Reopen the ticket from the admin inbox to send another message." : "Contact Sumz Market support if you need more help."}
+        </div>
+      ) : (
+        <form onSubmit={sendMessage} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, marginTop: 12 }}>
+          <textarea className="input" rows={2} maxLength={4000} placeholder={isAdmin ? "Reply to customer or send delivery details…" : "Message Sumz Market support…"} value={draft} onChange={event => setDraft(event.target.value)} />
+          <button className="btn" type="submit" disabled={busy || !draft.trim()}>{busy ? "Sending…" : "Send"}</button>
+        </form>
+      )}
       {message ? <div className="muted" role="status" style={{ marginTop: 8 }}>{message}</div> : null}
       <p className="muted" style={{ marginTop: 8 }}>Messages are visible only to this customer and authorized store staff.</p>
     </section>

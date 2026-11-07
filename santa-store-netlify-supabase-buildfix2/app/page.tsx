@@ -153,7 +153,7 @@ export default async function Home() {
             <a href="#inventory">Shop</a>
             <a href="/account">Support</a>
             <a href="/account">My Account</a>
-            <a className="market-nav-discord" href="https://discord.gg/ogaccs" target="_blank" rel="noopener noreferrer">Discord <span>↗</span></a>
+            <a className="market-nav-discord" href="https://discord.com/invite/sumz" target="_blank" rel="noopener noreferrer">Discord <span>↗</span></a>
           </div>
           <a className="market-login" href="/account">Sign in <span>→</span></a>
         </nav>
@@ -171,7 +171,7 @@ export default async function Home() {
             </p>
             <div className="market-hero-actions">
               <a className="market-primary-button" href="#inventory">Shop Now <span>→</span></a>
-              <a className="market-discord-button" href="https://discord.gg/ogaccs" target="_blank" rel="noopener noreferrer"><span>◉</span> Join Discord</a>
+              <a className="market-discord-button" href="https://discord.com/invite/sumz" target="_blank" rel="noopener noreferrer"><span>◉</span> Join Discord</a>
             </div>
             <div className="market-hero-note"><span className="market-live-dot" /> Live inventory · Prices in USD</div>
           </div>
@@ -214,7 +214,7 @@ export default async function Home() {
               <span>♛</span>
               <h3>New drops are on the way</h3>
               <p>No active products are published right now. Check back soon.</p>
-              <a className="market-discord-button" href="https://discord.gg/ogaccs" target="_blank" rel="noopener noreferrer">Join our Discord ↗</a>
+              <a className="market-discord-button" href="https://discord.com/invite/sumz" target="_blank" rel="noopener noreferrer">Join our Discord ↗</a>
             </div>
           ) : (
             <div className="market-inventory-groups">
@@ -251,7 +251,7 @@ export default async function Home() {
       <footer className="market-footer">
         <a className="market-brand" href="/"><span className="market-brand-mark">♛</span><span className="market-brand-words">SUMZ<span>MARKET</span></span></a>
         <span>© {new Date().getFullYear()} SUMZ MARKET · VERIFIED SINCE 2021</span>
-        <div><a href="/account">My Account</a><a href="/admin">Admin</a><a href="https://discord.gg/ogaccs" target="_blank" rel="noopener noreferrer">Discord ↗</a></div>
+        <div><a href="/account">My Account</a><a href="/admin">Admin</a><a href="https://discord.com/invite/sumz" target="_blank" rel="noopener noreferrer">Discord ↗</a></div>
       </footer>
     </>
   );

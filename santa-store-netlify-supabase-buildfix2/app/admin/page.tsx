@@ -144,11 +144,32 @@ export default function Admin() {
   }
 
   async function updateOrder(id: string, status: string) {
+    if (status === "refunded") return;
     setBusy(true);
     const { error } = await supabase.from("orders").update({ status, updated_at: new Date().toISOString() }).eq("id", id);
     setBusy(false);
-    setMessage(error ? "Order update failed: " + error.message : "Order status updated.");
-    if (!error) await loadAdmin();
+    if (error) setMessage("Order update failed: " + error.message);
+    else {
+      await loadAdmin();
+      setMessage("Order status updated.");
+    }
+  }
+
+  async function refundOrder(order: Order) {
+    if (!window.confirm("Refund " + money(order.total_cents) + " to this customer's store balance? This cannot be undone.")) return;
+    setBusy(true);
+    const { data, error } = await supabase.rpc("refund_order_to_balance", {
+      p_order_id: order.id,
+      p_note: "Admin refund for order " + order.order_number,
+    });
+    setBusy(false);
+    if (error) {
+      setMessage("Refund failed: " + error.message);
+      return;
+    }
+    const result = data as { refunded_cents?: number };
+    await loadAdmin();
+    setMessage("Refunded " + money(Number(result?.refunded_cents ?? order.total_cents)) + " to the customer's store balance.");
   }
 
   const canManage = role === "admin" || role === "staff";
@@ -253,8 +274,15 @@ export default function Admin() {
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
                       <span className="muted">Order status</span>
                       <select className="input" value={order.status} disabled={busy} onChange={e => void updateOrder(order.id, e.target.value)}>
-                        {STATUSES.map(status => <option key={status} value={status}>{pretty(status)}</option>)}
+                        {STATUSES.map(status => <option key={status} value={status} disabled={status === "refunded"}>{pretty(status)}</option>)}
                       </select>
+                      {["paid", "processing", "completed"].includes(order.status) ? (
+                        <button className="btn secondary" type="button" disabled={busy} onClick={() => void refundOrder(order)}>
+                          Refund to balance
+                        </button>
+                      ) : order.status === "refunded" ? (
+                        <span className="pill">Refunded to balance</span>
+                      ) : null}
                     </div>
                   </article>
                 ))}

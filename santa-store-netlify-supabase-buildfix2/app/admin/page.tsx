@@ -8,6 +8,7 @@ type Product = {
   id: string; name: string; slug: string; description: string | null;
   category: string | null; emoji: string | null; badge: string | null;
   price_cents: number; price_max_cents: number | null;
+  warranty_price_cents: number | null; stock_count: number | null;
   stock_label: string | null; active: boolean; sort_order: number;
 };
 type Order = {
@@ -31,6 +32,8 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("");
+  const [productWarrantyPrice, setProductWarrantyPrice] = useState("");
+  const [productStockCount, setProductStockCount] = useState("");
   const [productCategory, setProductCategory] = useState("Fortnite");
   const [productDescription, setProductDescription] = useState("");
   const [productEmoji, setProductEmoji] = useState("🎮");
@@ -106,8 +109,18 @@ export default function Admin() {
   async function addProduct(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const cents = Math.round(Number(productPrice) * 100);
+    const warrantyCents = productWarrantyPrice.trim() ? Math.round(Number(productWarrantyPrice) * 100) : null;
+    const stockCount = productStockCount.trim() ? Number(productStockCount) : null;
     if (!productName.trim() || !Number.isFinite(cents) || cents < 0) {
       setMessage("Enter a product name and a valid price.");
+      return;
+    }
+    if (warrantyCents !== null && (!Number.isFinite(warrantyCents) || warrantyCents < 0)) {
+      setMessage("Enter a valid With Warranty price.");
+      return;
+    }
+    if (stockCount !== null && (!Number.isInteger(stockCount) || stockCount < 0)) {
+      setMessage("Enter a whole-number stock count of zero or more.");
       return;
     }
     const slugBase = productName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -121,7 +134,9 @@ export default function Admin() {
       badge: productCategory.trim() || "Digital item",
       emoji: productEmoji.trim() || "🎁",
       price_cents: cents,
-      stock_label: productStock.trim() || "Available",
+      warranty_price_cents: warrantyCents,
+      stock_count: stockCount,
+      stock_label: stockCount === null ? (productStock.trim() || "Available") : stockCount === 0 ? "Out of stock" : stockCount + " in stock",
       active: productActive,
       sort_order: products.length + 1,
     });
@@ -131,6 +146,8 @@ export default function Admin() {
       setMessage("Product added.");
       setProductName("");
       setProductPrice("");
+      setProductWarrantyPrice("");
+      setProductStockCount("");
       setProductDescription("");
       await loadAdmin();
     }
@@ -225,7 +242,9 @@ export default function Admin() {
             <form className="product pbody" onSubmit={addProduct} style={{ display: "grid", gap: 12, marginTop: 12 }}>
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))" }}>
                 <input className="input" placeholder="Product name" value={productName} onChange={e => setProductName(e.target.value)} required />
-                <input className="input" placeholder="Price (USD)" type="number" min="0" step="0.01" value={productPrice} onChange={e => setProductPrice(e.target.value)} required />
+                <input className="input" placeholder="Price / No Warranty (USD)" type="number" min="0" step="0.01" value={productPrice} onChange={e => setProductPrice(e.target.value)} required />
+                <input className="input" placeholder="With Warranty price (optional)" type="number" min="0" step="0.01" value={productWarrantyPrice} onChange={e => setProductWarrantyPrice(e.target.value)} />
+                <input className="input" placeholder="Stock quantity" type="number" min="0" step="1" value={productStockCount} onChange={e => setProductStockCount(e.target.value)} />
                 <input className="input" placeholder="Category" value={productCategory} onChange={e => setProductCategory(e.target.value)} />
                 <input className="input" placeholder="Emoji" value={productEmoji} onChange={e => setProductEmoji(e.target.value)} />
                 <input className="input" placeholder="Stock label" value={productStock} onChange={e => setProductStock(e.target.value)} />
@@ -247,7 +266,16 @@ export default function Admin() {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 14, flexWrap: "wrap" }}>
                       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                         <div className="art" style={{ width: 62, height: 62, borderRadius: 10, fontSize: 30 }}>{product.emoji ?? "🎁"}</div>
-                        <div><b>{product.name}</b><div className="muted">{product.category ?? "Digital item"} · {money(product.price_cents)}</div></div>
+                        <div>
+                          <b>{product.name}</b>
+                          <div className="muted">{product.category ?? "Digital item"}</div>
+                          <div className="muted">
+                            {product.category === "Fortnite FA Accounts"
+                              ? "No Warranty " + money(product.price_cents) + " · With Warranty " + (product.warranty_price_cents === null ? "—" : money(product.warranty_price_cents))
+                              : money(product.price_cents)}
+                            {" · Stock " + (product.stock_count === null ? (product.stock_label ?? "not set") : product.stock_count.toLocaleString())}
+                          </div>
+                        </div>
                       </div>
                       <label className="muted" style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <input type="checkbox" checked={product.active} disabled={busy} onChange={e => void updateProduct(product.id, { active: e.target.checked })} /> Published
@@ -255,6 +283,17 @@ export default function Admin() {
                     </div>
                     <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 13 }}>
                       <input className="input" style={{ minWidth: 150, width: 180 }} aria-label={"Stock label for " + product.name} defaultValue={product.stock_label ?? "Available"} onBlur={e => { if (e.target.value !== (product.stock_label ?? "")) void updateProduct(product.id, { stock_label: e.target.value }); }} />
+                      <input className="input" style={{ minWidth: 120, width: 140 }} type="number" min="0" step="1" aria-label={"Stock count for " + product.name} defaultValue={product.stock_count ?? ""} placeholder="Stock count" onBlur={e => {
+                        const value = e.target.value.trim() === "" ? null : Number(e.target.value);
+                        if (value !== null && (!Number.isInteger(value) || value < 0)) {
+                          setMessage("Stock count must be a whole number of zero or more.");
+                          return;
+                        }
+                        if (value !== product.stock_count) void updateProduct(product.id, {
+                          stock_count: value,
+                          stock_label: value === null ? "Available" : value === 0 ? "Out of stock" : value + " in stock",
+                        });
+                      }} />
                       <span className="muted">Slug: {product.slug}</span>
                     </div>
                   </article>

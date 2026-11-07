@@ -260,6 +260,7 @@ export default function Account() {
                       orderId={order.id}
                       orderNumber={order.order_number}
                       initialConversationId={conversationsByOrder[order.id] ?? null}
+                      canVouch={order.status === "completed"}
                     />
                   ) : null}
                 </article>

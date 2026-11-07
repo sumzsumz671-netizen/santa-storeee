@@ -119,25 +119,46 @@ export default function ManualCheckout({
 
           {method === "cash_app" ? (
             <div>
-              <b>Send Cash App payment to</b>
+              <b>Pay with Cash App</b>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 7, flexWrap: "wrap" }}>
                 <code>{PAYMENT_DETAILS.cash_app.recipient}</code>
-                <button className="btn secondary" type="button" onClick={() => void copyValue("Cash App tag", PAYMENT_DETAILS.cash_app.recipient)}>Copy</button>
+                <button className="btn secondary" type="button" onClick={() => void copyValue("Cash App tag", PAYMENT_DETAILS.cash_app.recipient)}>Copy tag</button>
               </div>
+              <a
+                className="btn"
+                href="https://cash.app/$Xavier3099451"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ width: "100%", marginTop: 12 }}
+              >
+                Open Cash App to Pay
+              </a>
+              <p className="muted" style={{ marginTop: 8 }}>
+                Enter the exact total shown above and put order {orderNumber} in the payment note.
+              </p>
             </div>
           ) : null}
 
           {method === "paypal" ? (
             <div>
-              <b>PayPal recipient</b>
+              <b>Pay with PayPal</b>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 7, flexWrap: "wrap" }}>
                 <code>{PAYMENT_DETAILS.paypal.recipient}</code>
-                <button className="btn secondary" type="button" onClick={() => void copyValue("PayPal recipient", PAYMENT_DETAILS.paypal.recipient)}>Copy</button>
+                <button className="btn secondary" type="button" onClick={() => void copyValue("PayPal recipient", PAYMENT_DETAILS.paypal.recipient)}>Copy name</button>
               </div>
+              <a
+                className="btn"
+                href={`https://paypal.me/Sumzsumz71/${(totalCents / 100).toFixed(2)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ width: "100%", marginTop: 12 }}
+              >
+                Open PayPal to Pay ${(totalCents / 100).toFixed(2)}
+              </a>
               <div className="notice" style={{ marginTop: 12 }}>
                 <b>PayPal payment instructions</b>
                 <p style={{ margin: "7px 0 0" }}>
-                  This is a purchase. Choose PayPal's <b>Goods and Services</b> payment type. Do not select Friends and Family for a purchase.
+                  This is a purchase. Choose <b>Goods and Services</b> and add order {orderNumber} as the payment note. Do not use Friends and Family for a purchase.
                 </p>
               </div>
             </div>

@@ -133,6 +133,9 @@ export default function ManualCheckout({
           <button className="btn secondary" type="button" style={{ width: "100%", marginTop: 8 }} disabled={busy} onClick={placeOrder}>
             {busy ? "Creating order…" : "Place order"}
           </button>
+          <p className="muted" style={{ margin: "9px 0 0", lineHeight: 1.5 }}>
+            By purchasing, you agree to our <a href="/terms" style={{ color: "#d8a8ff", textDecoration: "underline" }}>Terms of Service</a>.
+          </p>
         </>
       ) : (
         <section style={{ border: "1px solid #444", borderRadius: 12, padding: 13, marginTop: 10 }}>

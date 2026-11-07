@@ -126,6 +126,33 @@ export default function AdminSupportInbox() {
 
     setStatusBusy(conversationId);
     setMessage("");
+
+    const { data: attachmentRows, error: attachmentReadError } = await supabase
+      .from("chat_messages")
+      .select("attachment_path")
+      .eq("conversation_id", conversationId);
+
+    if (attachmentReadError) {
+      setStatusBusy("");
+      setMessage("Could not prepare ticket deletion: " + attachmentReadError.message);
+      return;
+    }
+
+    const attachmentPaths = (attachmentRows ?? [])
+      .map(row => row.attachment_path as string | null)
+      .filter((value): value is string => !!value);
+
+    if (attachmentPaths.length) {
+      const { error: removeError } = await supabase.storage
+        .from("support-attachments")
+        .remove(attachmentPaths);
+      if (removeError) {
+        setStatusBusy("");
+        setMessage("Could not delete ticket attachments: " + removeError.message);
+        return;
+      }
+    }
+
     const { data, error } = await supabase
       .from("support_conversations")
       .delete()

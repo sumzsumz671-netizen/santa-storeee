@@ -155,12 +155,6 @@ export default function ManualCheckout({
               >
                 Open PayPal to Pay ${(totalCents / 100).toFixed(2)}
               </a>
-              <div className="notice" style={{ marginTop: 12 }}>
-                <b>PayPal payment instructions</b>
-                <p style={{ margin: "7px 0 0" }}>
-                  This is a store purchase. Choose <b>Goods and Services / Paying for an item or service</b> and add order <b>{orderNumber}</b> as the payment note. Do not select Friends and Family for a purchase. If PayPal does not offer the purchase option, use another payment method instead.
-                </p>
-              </div>
             </div>
           ) : null}
 

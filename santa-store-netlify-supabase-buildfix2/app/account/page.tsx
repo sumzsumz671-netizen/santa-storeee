@@ -120,7 +120,7 @@ export default function Account() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { emailRedirectTo: location.origin + "/account" },
+      options: { emailRedirectTo: "https://sumz.store/account" },
     });
     setBusy(false);
     setMessage(error?.message ?? (data.session

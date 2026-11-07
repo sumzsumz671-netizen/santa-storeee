@@ -34,6 +34,7 @@ export default function AdminSupportInbox() {
   const [selectedId, setSelectedId] = useState("");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [statusBusy, setStatusBusy] = useState("");
 
   const loadInbox = useCallback(async () => {
     setLoading(true);
@@ -87,6 +88,26 @@ export default function AdminSupportInbox() {
 
   const selected = items.find(item => item.conversation.id === selectedId);
 
+  async function changeTicketStatus(conversationId: string, nextStatus: "open" | "closed") {
+    setStatusBusy(conversationId);
+    setMessage("");
+    const { error } = await supabase
+      .from("support_conversations")
+      .update({ status: nextStatus, updated_at: new Date().toISOString() })
+      .eq("id", conversationId);
+    setStatusBusy("");
+    if (error) {
+      setMessage("Could not " + (nextStatus === "closed" ? "close" : "reopen") + " ticket: " + error.message);
+      return;
+    }
+    setItems(current => current.map(item => item.conversation.id === conversationId
+      ? { ...item, conversation: { ...item.conversation, status: nextStatus, updated_at: new Date().toISOString() } }
+      : item
+    ));
+    setMessage(nextStatus === "closed" ? "Ticket closed. The customer can no longer send messages." : "Ticket reopened. Messaging is available again.");
+  }
+
+
   return (
     <section style={{ marginTop: 42 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
@@ -126,7 +147,7 @@ export default function AdminSupportInbox() {
                 <span className="muted" style={{ display: "block", marginTop: 4 }}>
                   {item.order ? money(item.order.total_cents) + " · " + item.order.status.replaceAll("_", " ") : ""}
                 </span>
-                <span className="pill" style={{ marginTop: 8, display: "inline-block" }}>{reported ? "Payment reported" : "Chat opened"}</span>
+                <span className="pill" style={{ marginTop: 8, display: "inline-block" }}>{item.conversation.status === "closed" ? "Closed" : "Open"} · {reported ? "Payment reported" : "Chat opened"}</span>
               </button>
             );
           })}
@@ -147,6 +168,27 @@ export default function AdminSupportInbox() {
                   {selected.order.payment_reported_at
                     ? "Customer reported payment " + new Date(selected.order.payment_reported_at).toLocaleString()
                     : "Customer has not clicked I Have Paid yet."}
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+                  {selected.conversation.status === "open" ? (
+                    <button
+                      className="btn secondary"
+                      type="button"
+                      disabled={statusBusy === selected.conversation.id}
+                      onClick={() => void changeTicketStatus(selected.conversation.id, "closed")}
+                    >
+                      {statusBusy === selected.conversation.id ? "Closing…" : "Close Ticket"}
+                    </button>
+                  ) : (
+                    <button
+                      className="btn"
+                      type="button"
+                      disabled={statusBusy === selected.conversation.id}
+                      onClick={() => void changeTicketStatus(selected.conversation.id, "open")}
+                    >
+                      {statusBusy === selected.conversation.id ? "Reopening…" : "Reopen Ticket"}
+                    </button>
+                  )}
                 </div>
               </div>
               <OrderSupportChat

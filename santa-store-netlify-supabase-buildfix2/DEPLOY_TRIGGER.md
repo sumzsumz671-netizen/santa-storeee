@@ -1,1 +1,1 @@
-Production deployment marker: update all storefront Discord invite links to the Sumz invite.
+Production deployment marker: add product artwork for all catalog items, multi-skin bundle images, and branded fallback artwork.

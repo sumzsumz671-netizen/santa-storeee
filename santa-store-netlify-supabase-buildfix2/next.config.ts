@@ -1,3 +1,3 @@
 import type { NextConfig } from "next";
-const nextConfig: NextConfig = { poweredByHeader: false, output: "standalone" };
+const nextConfig: NextConfig = { poweredByHeader: false };
 export default nextConfig;

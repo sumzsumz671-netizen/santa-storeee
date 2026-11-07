@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   }
 
   const authorization = request.headers.get("authorization") ?? "";
-  const accessToken = authorization.match(/^Bearer\s+(.+)$/i)?.[1];
+  const accessToken = authorization.match(/^Bearer\\s+(.+)$/i)?.[1];
   if (!accessToken) {
     return Response.json({ error: "Please sign in before publishing a vouch." }, { status: 401 });
   }
@@ -111,19 +111,31 @@ export async function POST(request: Request) {
     const quantity = item.quantity > 1 ? " × " + item.quantity : "";
     return item.product_name + quantity + " — $" + total;
   });
-  const productSummary = itemLines.join("\n").slice(0, 1024) || "Completed store order";
-  const orderLabel = order.order_number;
+  const productSummary = itemLines.join("\\n").slice(0, 1024) || "Completed store order";
+  const orderNumber = String(order.order_number).replace(/^#/, "");
+  const orderLabel = "#" + orderNumber;
+  const vouchDate = new Date(vouch.created_at);
+  const dateLabel = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(vouchDate);
+
   const content = "🛍️ **New Marketplace Vouch (" + orderLabel + ")!**";
   const embed = {
     color: 0x22c55e,
     fields: [
-      { name: "Customer", value: "@" + vouch.customer_discord_tag + "\n✅ Verified Buyer", inline: true },
+      { name: "Customer", value: "@" + vouch.customer_discord_tag + "\\n✅ Verified Buyer", inline: true },
       { name: "Rating", value: vouch.rating + "/5", inline: true },
       { name: "Product ID / Item", value: productSummary },
       { name: "Feedback", value: vouch.feedback.slice(0, 1024) },
     ],
-    footer: { text: "Sumz Market • verified purchase • order " + orderLabel },
-    timestamp: new Date(vouch.created_at).toISOString(),
+    footer: { text: "Sumz Market • verified purchase • order " + orderLabel + " • " + dateLabel },
+    timestamp: vouchDate.toISOString(),
   };
 
   let webhookResponse: Response;

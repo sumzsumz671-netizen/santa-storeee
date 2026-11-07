@@ -186,7 +186,7 @@ export default async function Home() {
       <footer className="market-footer">
         <a className="market-brand" href="/"><span className="market-brand-mark">♛</span><span className="market-brand-words">SUMZ<span>MARKET</span></span></a>
         <span>© {new Date().getFullYear()} SUMZ MARKET · VERIFIED SINCE 2021</span>
-        <div><a href="/account">My Account</a><a href="/admin">Admin</a><a href="https://discord.com/invite/sumz" target="_blank" rel="noopener noreferrer">Discord ↗</a></div>
+        <div><a href="/terms">Terms of Service</a><a href="/account">My Account</a><a href="/admin">Admin</a><a href="https://discord.com/invite/sumz" target="_blank" rel="noopener noreferrer">Discord ↗</a></div>
       </footer>
     </>
   );

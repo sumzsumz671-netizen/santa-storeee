@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
 
-export default function BuyWithBalance({ productId }: { productId: string }) {
+export default function BuyWithBalance({
+  productId,
+  warrantyPriceCents,
+}: {
+  productId: string;
+  warrantyPriceCents?: number | null;
+}) {
+  const [withWarranty, setWithWarranty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -20,6 +27,7 @@ export default function BuyWithBalance({ productId }: { productId: string }) {
     const { data, error } = await supabase.rpc("purchase_product_with_balance", {
       p_product_id: productId,
       p_quantity: 1,
+      p_warranty: withWarranty,
     });
     setBusy(false);
 
@@ -43,6 +51,12 @@ export default function BuyWithBalance({ productId }: { productId: string }) {
 
   return (
     <div style={{ marginTop: 10 }}>
+      {typeof warrantyPriceCents === "number" ? (
+        <label className="muted" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <input type="checkbox" checked={withWarranty} onChange={event => setWithWarranty(event.target.checked)} disabled={busy} />
+          With Warranty · ${(warrantyPriceCents / 100).toFixed(2)}
+        </label>
+      ) : null}
       <button className="btn" type="button" style={{ width: "100%" }} disabled={busy} onClick={buy}>
         {busy ? "Processing…" : "Buy with store balance"}
       </button>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
+import OrderSupportChat from "../../components/OrderSupportChat";
 
 type OrderItem = {
   id: string;
@@ -17,6 +18,7 @@ type Order = {
   total_cents: number;
   created_at: string;
   order_items: OrderItem[];
+  payment_reported_at: string | null;
 };
 type WalletTransaction = {
   id: string;
@@ -39,6 +41,7 @@ export default function Account() {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [conversationsByOrder, setConversationsByOrder] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
@@ -51,21 +54,23 @@ export default function Account() {
       return;
     }
     setUserEmail(userResult.user.email ?? "");
-    const [{ data: profile }, { data: orderRows, error: orderError }, { data: walletRows, error: walletError }] = await Promise.all([
+    const [{ data: profile }, { data: orderRows, error: orderError }, { data: walletRows, error: walletError }, { data: conversationRows, error: conversationError }] = await Promise.all([
       supabase.from("profiles").select("role,wallet_balance_cents").eq("id", userResult.user.id).maybeSingle(),
       supabase
         .from("orders")
-        .select("id,order_number,status,payment_method,total_cents,created_at,order_items(id,product_name,quantity,unit_price_cents)")
+        .select("id,order_number,status,payment_method,total_cents,created_at,payment_reported_at,order_items(id,product_name,quantity,unit_price_cents)")
         .order("created_at", { ascending: false }),
       supabase.from("wallet_transactions")
         .select("id,transaction_type,amount_cents,balance_after_cents,note,created_at")
         .order("created_at", { ascending: false }).limit(12),
+      supabase.from("support_conversations").select("id,order_id").order("updated_at", { ascending: false }),
     ]);
     setRole(profile?.role ?? "customer");
     setBalance(Number(profile?.wallet_balance_cents ?? 0));
     setOrders((orderRows ?? []) as Order[]);
     setTransactions((walletRows ?? []) as WalletTransaction[]);
-    setMessage(orderError ? "Your orders could not be loaded: " + orderError.message : walletError ? "Your wallet history could not be loaded: " + walletError.message : "");
+    setConversationsByOrder(Object.fromEntries((conversationRows ?? []).map(row => [row.order_id, row.id])));
+    setMessage(orderError ? "Your orders could not be loaded: " + orderError.message : walletError ? "Your wallet history could not be loaded: " + walletError.message : conversationError ? "Your support chats could not be loaded: " + conversationError.message : "");
     setLoading(false);
   }, []);
 
@@ -76,6 +81,7 @@ export default function Account() {
         setUserEmail("");
         setOrders([]);
         setTransactions([]);
+        setConversationsByOrder({});
         setBalance(0);
         setRole("customer");
       } else {
@@ -249,6 +255,13 @@ export default function Account() {
                   <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #303036", marginTop: 10, paddingTop: 12 }}>
                     <b>Total</b><b>{money(order.total_cents)}</b>
                   </div>
+                  {order.payment_method !== "store_balance" && (order.status === "pending_payment" || conversationsByOrder[order.id]) ? (
+                    <OrderSupportChat
+                      orderId={order.id}
+                      orderNumber={order.order_number}
+                      initialConversationId={conversationsByOrder[order.id] ?? null}
+                    />
+                  ) : null}
                 </article>
               ))}
             </div>

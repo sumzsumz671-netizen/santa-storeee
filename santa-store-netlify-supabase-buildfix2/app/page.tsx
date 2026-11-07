@@ -92,10 +92,14 @@ function ProductCard({ product }: { product: Product }) {
           <span className="stock-dot" />
           <span>{stockText}</span>
         </div>
-        <div style={{ marginTop: 14 }}>
-          <BuyWithBalance productId={product.id} />
-          <ManualCheckout productId={product.id} productName={product.name} />
-        </div>
+        {product.stock_count === 0 ? (
+          <div className="notice" style={{ marginTop: 14 }}>Out of stock</div>
+        ) : (
+          <div style={{ marginTop: 14 }}>
+            <BuyWithBalance productId={product.id} warrantyPriceCents={product.warranty_price_cents} />
+            <ManualCheckout productId={product.id} productName={product.name} warrantyPriceCents={product.warranty_price_cents} />
+          </div>
+        )}
       </div>
     </article>
   );

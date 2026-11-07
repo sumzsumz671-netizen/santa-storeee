@@ -83,7 +83,7 @@ function ProductCard({ product, cosmeticImages }: { product: Product; cosmeticIm
 
   return (
     <article className="market-product" key={product.id}>
-      <div className={"market-product-art" + (image ? " has-product-image" : "")}>
+      <div className="market-product-art has-product-image">
         <div className="market-product-glow" />
         {productImages.length > 0 ? (
           productImages.length === 1 ? (

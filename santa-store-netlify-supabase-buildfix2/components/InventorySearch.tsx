@@ -40,15 +40,15 @@ const COSMETIC_ALIASES: Record<string, string> = {
 
 function productCosmeticName(product: Product): string | null {
   const original = product.name.trim();
-  let base = original
-    .replace(/^OG\\s+/i, "")
-    .replace(/\\s+FA$/i, "")
+  if (/^OG Save The World$/i.test(original)) return null;
+
+  const base = original
+    .replace(/^OG\s+/i, "")
+    .replace(/\s+FA$/i, "")
     .split(" + ")[0]
     .trim();
 
-  if (/\\b(v[- ]?bucks|skins?)\\b/i.test(base) || /^OG Save The World$/i.test(base)) {
-    return null;
-  }
+  if (/\b(v[- ]?bucks|skins?)\b/i.test(base)) return null;
 
   const key = base.toLowerCase();
   return COSMETIC_ALIASES[key] ?? base;

@@ -97,7 +97,7 @@ function ProductCard({ product }: { product: Product }) {
         ) : (
           <div style={{ marginTop: 14 }}>
             <BuyWithBalance productId={product.id} warrantyPriceCents={product.warranty_price_cents} />
-            <ManualCheckout productId={product.id} productName={product.name} warrantyPriceCents={product.warranty_price_cents} />
+            <ManualCheckout productId={product.id} productName={product.name} priceCents={product.price_cents} warrantyPriceCents={product.warranty_price_cents} />
           </div>
         )}
       </div>

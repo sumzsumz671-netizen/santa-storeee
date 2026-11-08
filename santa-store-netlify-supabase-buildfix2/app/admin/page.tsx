@@ -225,11 +225,22 @@ export default function Admin() {
         </div>
       ) : (
         <section style={{ margin: "35px auto", maxWidth: 1120 }}>
-          <div className="eyebrow">STORE CONTROL CENTER</div>
-          <h1 style={{ fontSize: 34, margin: "8px 0" }}>Welcome, {role}</h1>
-          <p className="muted">Signed in as {userEmail}. Manage products, stock visibility, and customer orders.</p>
+          <div className="admin-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: 18, flexWrap: "wrap", padding: "26px 0 20px", borderBottom: "1px solid #253d29" }}>
+            <div>
+              <div className="eyebrow">SUMZ MARKET · CONTROL CENTER</div>
+              <h1 style={{ fontSize: 36, margin: "8px 0" }}>Welcome back, {role === "owner" ? "Owner" : role}</h1>
+              <p className="muted">Signed in as {userEmail}. Your store operations at a glance.</p>
+            </div>
+            <button className="btn secondary" type="button" onClick={() => void loadAdmin()} disabled={loading || busy}>{loading ? "Refreshing…" : "↻ Refresh dashboard"}</button>
+          </div>
 
-          <div className="grid" style={{ marginTop: 24, gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))" }}>
+          <nav aria-label="Admin sections" className="admin-section-nav" style={{ display: "flex", gap: 9, flexWrap: "wrap", position: "sticky", top: 0, zIndex: 5, padding: "12px 0", background: "rgba(5,9,6,.96)", backdropFilter: "blur(12px)" }}>
+            {[["Overview","#admin-overview"],["Support inbox","#admin-support"],["Customers","#admin-customers"],["Orders","#admin-orders"],["Inventory","#admin-inventory"],["Staff","#admin-staff"]].map(([label,href]) => (
+              <a key={href} href={href} className="btn secondary" style={{ textDecoration: "none", fontSize: 12, padding: "9px 13px" }}>{label}</a>
+            ))}
+          </nav>
+
+          <div id="admin-overview" className="grid" style={{ marginTop: 18, gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))" }}>
             <div className="product pbody"><div className="muted">Total products</div><div style={{ fontSize: 30, fontWeight: 900 }}>{products.length}</div></div>
             <div className="product pbody"><div className="muted">Active listings</div><div style={{ fontSize: 30, fontWeight: 900 }}>{products.filter(p => p.active).length}</div></div>
             <div className="product pbody"><div className="muted">Total orders</div><div style={{ fontSize: 30, fontWeight: 900 }}>{orders.length}</div></div>
@@ -238,16 +249,16 @@ export default function Admin() {
 
           {message ? <div className="notice" role="status" style={{ marginTop: 18 }}>{message}</div> : null}
 
-          {role === "owner" ? <AdminStaffManagement /> : null}
+          {role === "owner" ? <div id="admin-staff"><AdminStaffManagement /></div> : null}
 
-          {role === "owner" || role === "admin" ? <AdminCustomerModeration /> : null}
+          {role === "owner" || role === "admin" ? <div id="admin-customers"><AdminCustomerModeration /></div> : null}
 
-          <AdminSupportInbox isOwner={role === "owner"} />
+          <div id="admin-support"><AdminSupportInbox isOwner={role === "owner"} /></div>
 
           <AdminWalletTopups />
 
           <div style={{ marginTop: 38 }}>
-            <h2 style={{ fontSize: 25 }}>Add a product</h2>
+            <h2 id="admin-inventory" style={{ fontSize: 25 }}>Add a product</h2>
             <form className="product pbody" onSubmit={addProduct} style={{ display: "grid", gap: 12, marginTop: 12 }}>
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))" }}>
                 <input className="input" placeholder="Product name" value={productName} onChange={e => setProductName(e.target.value)} required />
@@ -312,7 +323,7 @@ export default function Admin() {
           </div>
 
           <div style={{ marginTop: 38 }}>
-            <h2 style={{ fontSize: 25 }}>Customer orders ({orders.length})</h2>
+            <h2 id="admin-orders" style={{ fontSize: 25 }}>Customer orders ({orders.length})</h2>
             {orders.length === 0 ? <div className="product pbody muted" style={{ marginTop: 12 }}>No customer orders have been placed yet.</div> : (
               <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
                 {orders.map(order => (

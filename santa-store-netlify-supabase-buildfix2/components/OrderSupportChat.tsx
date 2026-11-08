@@ -53,6 +53,9 @@ export default function OrderSupportChat({
   const [vouchRating, setVouchRating] = useState(5);
   const [vouchDiscordTag, setVouchDiscordTag] = useState("");
   const [vouchFeedback, setVouchFeedback] = useState("");
+  const [vouchPhoto, setVouchPhoto] = useState<File | null>(null);
+  const [vouchPhotoPreview, setVouchPhotoPreview] = useState("");
+  const [existingVouchPhotoUrl, setExistingVouchPhotoUrl] = useState("");
   const [vouchMessage, setVouchMessage] = useState("");
   const [existingVouch, setExistingVouch] = useState<{
     id: string;
@@ -60,6 +63,7 @@ export default function OrderSupportChat({
     feedback: string;
     customer_discord_tag: string;
     discord_status: "pending" | "sending" | "sent" | "failed";
+    photo_path: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -77,7 +81,7 @@ export default function OrderSupportChat({
       setVouchLoading(true);
       const { data, error } = await supabase
         .from("order_vouches")
-        .select("id,rating,feedback,customer_discord_tag,discord_status")
+        .select("id,rating,feedback,customer_discord_tag,discord_status,photo_path")
         .eq("order_id", orderId)
         .maybeSingle();
 
@@ -89,7 +93,12 @@ export default function OrderSupportChat({
             feedback: string;
             customer_discord_tag: string;
             discord_status: "pending" | "sending" | "sent" | "failed";
+            photo_path: string | null;
           });
+          if (data.photo_path) {
+            const { data: signed } = await supabase.storage.from("vouch-photos").createSignedUrl(data.photo_path, 60 * 60);
+            if (active) setExistingVouchPhotoUrl(signed?.signedUrl ?? "");
+          }
         }
         setVouchLoading(false);
       }
@@ -341,6 +350,14 @@ export default function OrderSupportChat({
       setVouchMessage("Enter your Discord username (2–80 letters, numbers, dots, underscores, or hyphens).");
       return;
     }
+    if (!vouchPhoto) {
+      setVouchMessage("Upload a photo or screenshot of your purchase before submitting your vouch.");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(vouchPhoto.type) || vouchPhoto.size > 8 * 1024 * 1024) {
+      setVouchMessage("Choose a JPG, PNG, or WEBP image no larger than 8 MB.");
+      return;
+    }
     if (feedback.length < 5 || feedback.length > 1000) {
       setVouchMessage("Your feedback must be between 5 and 1,000 characters.");
       return;
@@ -351,7 +368,18 @@ export default function OrderSupportChat({
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
       setVouchBusy(false);
+      setVouchBusy(false);
       setVouchMessage("Please sign in again before leaving a vouch.");
+      return;
+    }
+
+    const photoPath = authData.user.id + "/" + orderId + "/" + crypto.randomUUID() + "-" + vouchPhoto.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80);
+    const { error: photoUploadError } = await supabase.storage.from("vouch-photos").upload(photoPath, vouchPhoto, {
+      cacheControl: "3600", contentType: vouchPhoto.type, upsert: false,
+    });
+    if (photoUploadError) {
+      setVouchBusy(false);
+      setVouchMessage("Photo upload failed: " + photoUploadError.message);
       return;
     }
 
@@ -363,11 +391,13 @@ export default function OrderSupportChat({
         customer_discord_tag: discordTag,
         rating: vouchRating,
         feedback,
+        photo_path: photoPath,
       })
-      .select("id,rating,feedback,customer_discord_tag,discord_status")
+      .select("id,rating,feedback,customer_discord_tag,discord_status,photo_path")
       .single();
 
     if (error || !data) {
+      await supabase.storage.from("vouch-photos").remove([photoPath]);
       setVouchBusy(false);
       setVouchMessage(error?.code === "23505"
         ? "A vouch has already been submitted for this order."
@@ -375,7 +405,7 @@ export default function OrderSupportChat({
       if (error?.code === "23505") {
         const { data: saved } = await supabase
           .from("order_vouches")
-          .select("id,rating,feedback,customer_discord_tag,discord_status")
+          .select("id,rating,feedback,customer_discord_tag,discord_status,photo_path")
           .eq("order_id", orderId)
           .maybeSingle();
         if (saved) setExistingVouch(saved as typeof existingVouch);
@@ -386,6 +416,8 @@ export default function OrderSupportChat({
     setExistingVouch(data as NonNullable<typeof existingVouch>);
     setVouchDiscordTag(discordTag);
     setVouchFeedback(feedback);
+    setVouchPhoto(null);
+    setVouchPhotoPreview("");
     await postVouchToDiscord(data.id);
   }
 
@@ -527,6 +559,7 @@ export default function OrderSupportChat({
         <div className="notice" style={{ marginTop: 12 }}>
           <b>Your vouch: {existingVouch.rating}/5</b>
           <p style={{ margin: "6px 0" }}>{existingVouch.feedback}</p>
+          {existingVouchPhotoUrl ? <a href={existingVouchPhotoUrl} target="_blank" rel="noopener noreferrer"><img src={existingVouchPhotoUrl} alt="Your submitted purchase proof" style={{ maxWidth: 220, maxHeight: 180, objectFit: "contain", borderRadius: 10, border: "1px solid #477d35", marginTop: 8 }} /></a> : null}
           <div className="muted">
             {existingVouch.discord_status === "sent"
               ? "Published to Discord."
@@ -562,7 +595,18 @@ export default function OrderSupportChat({
             Feedback
             <textarea className="input" style={{ width: "100%", marginTop: 6 }} rows={3} maxLength={1000} placeholder="Tell everyone about your purchase…" value={vouchFeedback} onChange={event => setVouchFeedback(event.target.value)} />
           </label>
-          <button className="btn" type="submit" disabled={vouchBusy || vouchLoading}>
+          <label className="muted" style={{ display: "grid", gap: 8 }}>
+            Purchase photo <strong style={{ color: "#a5ff52" }}>REQUIRED</strong>
+            <span>Upload a screenshot or photo showing your purchase. JPG, PNG, or WEBP · up to 8 MB.</span>
+            <input className="input" type="file" accept="image/jpeg,image/png,image/webp" required onChange={event => {
+              const file = event.target.files?.[0] ?? null;
+              setVouchPhoto(file);
+              setVouchPhotoPreview(file ? URL.createObjectURL(file) : "");
+              setVouchMessage("");
+            }} />
+            {vouchPhotoPreview ? <img src={vouchPhotoPreview} alt="Vouch photo preview" style={{ maxWidth: 220, maxHeight: 180, objectFit: "contain", borderRadius: 10, border: "1px solid #477d35" }} /> : null}
+          </label>
+          <button className="btn" type="submit" disabled={vouchBusy || vouchLoading || !vouchPhoto}>
             {vouchBusy ? "Submitting…" : "Submit Vouch"}
           </button>
         </form>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import AdminSupportInbox from "../../components/AdminSupportInbox";
 import AdminWalletTopups from "../../components/AdminWalletTopups";
+import AdminStaffManagement from "../../components/AdminStaffManagement";
 
 type Product = {
   id: string; name: string; slug: string; description: string | null;
@@ -53,7 +54,7 @@ export default function Admin() {
     setUserEmail(userResult.user.email ?? "");
     const { data: profile, error: profileError } = await supabase
       .from("profiles").select("role").eq("id", userResult.user.id).maybeSingle();
-    if (profileError || !profile || !["admin", "staff"].includes(profile.role)) {
+    if (profileError || !profile || !["owner", "admin", "staff"].includes(profile.role)) {
       setRole("customer");
       setProducts([]);
       setOrders([]);
@@ -191,7 +192,7 @@ export default function Admin() {
     setMessage("Refunded " + money(Number(result?.refunded_cents ?? order.total_cents)) + " to the customer's store balance.");
   }
 
-  const canManage = role === "admin" || role === "staff";
+  const canManage = role === "owner" || role === "admin" || role === "staff";
 
   return (
     <main className="wrap">
@@ -236,7 +237,9 @@ export default function Admin() {
 
           {message ? <div className="notice" role="status" style={{ marginTop: 18 }}>{message}</div> : null}
 
-          <AdminSupportInbox />
+          {role === "owner" ? <AdminStaffManagement /> : null}
+
+          <AdminSupportInbox isOwner={role === "owner"} />
 
           <AdminWalletTopups />
 

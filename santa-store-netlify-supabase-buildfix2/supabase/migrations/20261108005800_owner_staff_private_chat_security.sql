@@ -55,7 +55,7 @@ security definer
 set search_path = ''
 as $function$
 declare
-  v_email text := pg_catalog.lower(pg_catalog.btrim(pg_catalog.coalesce(p_email, '')));
+  v_email text := pg_catalog.lower(pg_catalog.btrim(coalesce(p_email, '')));
   v_matches integer;
   v_user_id uuid;
   v_current_role text;
@@ -79,7 +79,7 @@ begin
   select pg_catalog.count(*)
   into v_matches
   from public.profiles p
-  where pg_catalog.lower(pg_catalog.coalesce(p.email, '')) = v_email;
+  where pg_catalog.lower(coalesce(p.email, '')) = v_email;
 
   if v_matches = 0 then
     raise exception 'No registered Sumz Market account was found for that email. Ask them to create a customer account first.'
@@ -94,7 +94,7 @@ begin
   select p.id, p.role
   into v_user_id, v_current_role
   from public.profiles p
-  where pg_catalog.lower(pg_catalog.coalesce(p.email, '')) = v_email
+  where pg_catalog.lower(coalesce(p.email, '')) = v_email
   for update;
 
   if v_current_role = 'owner' then

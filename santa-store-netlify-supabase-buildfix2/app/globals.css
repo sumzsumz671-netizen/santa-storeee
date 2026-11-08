@@ -1189,3 +1189,15 @@ body {
   .market-hero:after { height: 20%; }
   .market-hero-bottom { font-size: 6.5px; }
 }
+
+.market-purchase-blocked {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(248,113,113,.46);
+  border-radius: 10px;
+  background: rgba(75,16,20,.48);
+  color: #fecaca;
+  font-size: 11px;
+  font-weight: 850;
+  text-align: center;
+}

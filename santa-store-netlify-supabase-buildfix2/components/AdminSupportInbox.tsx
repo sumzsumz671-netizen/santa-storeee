@@ -29,7 +29,7 @@ type InboxItem = {
 
 const money = (cents: number) => "$" + (cents / 100).toFixed(2);
 
-export default function AdminSupportInbox() {
+export default function AdminSupportInbox({ isOwner = false }: { isOwner?: boolean }) {
   const [items, setItems] = useState<InboxItem[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -146,6 +146,7 @@ export default function AdminSupportInbox() {
   }
 
   async function deleteTicketForBoth(conversationId: string) {
+    if (!isOwner) return;
     const target = items.find(item => item.conversation.id === conversationId);
     const orderLabel = target?.order?.order_number ?? "this ticket";
     if (!window.confirm("Delete " + orderLabel + " for both the customer and store staff? All chat messages will be permanently removed.")) return;
@@ -229,7 +230,7 @@ export default function AdminSupportInbox() {
         <div>
           <div className="eyebrow">CUSTOMER SUPPORT</div>
           <h2 style={{ fontSize: 25, margin: "7px 0" }}>1-on-1 customer chats</h2>
-          <p className="muted">Verify payments, reply to customers, and send their delivery details privately.</p>
+          <p className="muted">Verify payments and reply to customers. Owner-only delivery details are hidden from staff accounts.</p>
         </div>
         <button className="btn secondary" type="button" onClick={() => void loadInbox()} disabled={loading}>
           {loading ? "Refreshing…" : "Refresh chats"}
@@ -328,15 +329,17 @@ export default function AdminSupportInbox() {
                       {statusBusy === selected.conversation.id ? "Reopening…" : "Reopen Ticket"}
                     </button>
                   )}
-                  <button
-                    className="btn secondary"
-                    type="button"
-                    style={{ borderColor: "#7f1d1d", color: "#fca5a5" }}
-                    disabled={statusBusy === selected.conversation.id}
-                    onClick={() => void deleteTicketForBoth(selected.conversation.id)}
-                  >
-                    {statusBusy === selected.conversation.id ? "Deleting…" : "Delete Ticket for Both"}
-                  </button>
+                  {isOwner ? (
+                    <button
+                      className="btn secondary"
+                      type="button"
+                      style={{ borderColor: "#7f1d1d", color: "#fca5a5" }}
+                      disabled={statusBusy === selected.conversation.id}
+                      onClick={() => void deleteTicketForBoth(selected.conversation.id)}
+                    >
+                      {statusBusy === selected.conversation.id ? "Deleting…" : "Delete Ticket for Both"}
+                    </button>
+                  ) : null}
                 </div>
               </div>
               <OrderSupportChat
@@ -345,6 +348,7 @@ export default function AdminSupportInbox() {
                 orderNumber={selected.order.order_number}
                 initialConversationId={selected.conversation.id}
                 isAdmin
+                isOwner={isOwner}
                 customerEmail={selected.profile?.email ?? undefined}
               />
             </>

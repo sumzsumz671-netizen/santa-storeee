@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import BuyWithBalance from "./BuyWithBalance";
 import ManualCheckout from "./ManualCheckout";
+import { supabase } from "../lib/supabase";
 
 type Product = {
   id: string;
@@ -67,7 +68,7 @@ function fallbackProductImage(product: Product) {
   return "/images/product-fa-accounts.svg";
 }
 
-function ProductCard({ product, cosmeticImages }: { product: Product; cosmeticImages: Record<string, string> }) {
+function ProductCard({ product, cosmeticImages, purchaseBlocked }: { product: Product; cosmeticImages: Record<string, string>; purchaseBlocked: boolean }) {
   const isFA = product.category === "Fortnite FA Accounts";
   const soldOut = product.stock_count === 0;
   const productImages = productCosmeticNames(product)
@@ -125,6 +126,8 @@ function ProductCard({ product, cosmeticImages }: { product: Product; cosmeticIm
         </div>
         {soldOut ? (
           <div className="market-sold-out">Currently unavailable</div>
+        ) : purchaseBlocked ? (
+          <div className="market-purchase-blocked" role="status">Purchasing disabled for this account</div>
         ) : (
           <div className="market-buy-actions">
             <BuyWithBalance productId={product.id} warrantyPriceCents={product.warranty_price_cents} />
@@ -139,6 +142,7 @@ function ProductCard({ product, cosmeticImages }: { product: Product; cosmeticIm
 export default function InventorySearch({ groups }: { groups: InventoryGroup[] }) {
   const [query, setQuery] = useState("");
   const [cosmeticImages, setCosmeticImages] = useState<Record<string, string>>({});
+  const [purchaseBlocked, setPurchaseBlocked] = useState(false);
   const cosmeticNames = useMemo(
     () => [...new Set(groups.flatMap(group => group.products.flatMap(productCosmeticNames)))],
     [groups]
@@ -165,6 +169,39 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
 
     return () => controller.abort();
   }, [cosmeticNames]);
+  useEffect(() => {
+    let active = true;
+
+    const loadPurchaseAccess = async (userId: string | null) => {
+      if (!userId) {
+        if (active) setPurchaseBlocked(false);
+        return;
+      }
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("purchase_blocked")
+        .eq("id", userId)
+        .maybeSingle();
+      if (active && !error) setPurchaseBlocked(data?.purchase_blocked === true);
+      if (active && error) setPurchaseBlocked(false);
+    };
+
+    void supabase.auth.getUser().then(({ data, error }) => {
+      if (active) void loadPurchaseAccess(error ? null : data.user?.id ?? null);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      window.setTimeout(() => {
+        if (active) void loadPurchaseAccess(session?.user.id ?? null);
+      }, 0);
+    });
+
+    return () => {
+      active = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
   const filteredGroups = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return groups;

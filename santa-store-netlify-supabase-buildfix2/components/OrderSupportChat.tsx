@@ -12,6 +12,7 @@ type ChatMessage = {
   attachment_name: string | null;
   attachment_mime_type: string | null;
   attachment_size_bytes: number | null;
+  owner_only: boolean;
   attachment_url?: string | null;
 };
 
@@ -20,6 +21,7 @@ export default function OrderSupportChat({
   orderNumber,
   initialConversationId,
   isAdmin = false,
+  isOwner = false,
   customerEmail,
   canVouch = false,
   orderCompleted = false,
@@ -28,6 +30,7 @@ export default function OrderSupportChat({
   orderNumber: string;
   initialConversationId?: string | null;
   isAdmin?: boolean;
+  isOwner?: boolean;
   customerEmail?: string;
   canVouch?: boolean;
   orderCompleted?: boolean;
@@ -37,6 +40,7 @@ export default function OrderSupportChat({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentUserId, setCurrentUserId] = useState("");
   const [draft, setDraft] = useState("");
+  const [ownerOnly, setOwnerOnly] = useState(isOwner);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState("");
@@ -152,7 +156,7 @@ export default function OrderSupportChat({
     setLoading(true);
     const { data, error } = await supabase
       .from("chat_messages")
-      .select("id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size_bytes")
+      .select("id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size_bytes,owner_only")
       .eq("conversation_id", conversationId)
       .order("created_at", { ascending: true });
 
@@ -425,11 +429,13 @@ export default function OrderSupportChat({
         conversation_id: conversationId,
         sender_id: authData.user.id,
         body,
+        owner_only: isOwner && ownerOnly,
       });
       setBusy(false);
       if (error) setMessage(error.message);
       else {
         setDraft("");
+        setOwnerOnly(isOwner);
         await loadMessages();
       }
       return;
@@ -463,6 +469,7 @@ export default function OrderSupportChat({
           attachment_name: file.name.slice(0, 255),
           attachment_mime_type: file.type,
           attachment_size_bytes: file.size,
+          owner_only: isOwner && ownerOnly,
         });
 
         if (insertError) {
@@ -473,6 +480,7 @@ export default function OrderSupportChat({
 
       setDraft("");
       setSelectedFiles([]);
+      setOwnerOnly(isOwner);
       if (uploadInputRef.current) uploadInputRef.current.value = "";
       setMessage("Message and attachment(s) sent.");
       await loadMessages();
@@ -600,6 +608,7 @@ export default function OrderSupportChat({
           const mine = item.sender_id === currentUserId;
           return (
             <div key={item.id} style={{ justifySelf: mine ? "end" : "start", maxWidth: "88%", background: mine ? "#3a151b" : "#222228", border: "1px solid #393940", borderRadius: 12, padding: "10px 12px" }}>
+              {isOwner && item.owner_only ? <div className="pill" style={{ marginBottom: 7 }}>Owner-only · hidden from staff</div> : null}
               <div style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{item.body}</div>
               {item.attachment_path ? (
                 <div style={{ marginTop: 9, display: "grid", gap: 6 }}>
@@ -633,7 +642,7 @@ export default function OrderSupportChat({
                   ) : null}
                 </div>
               ) : null}
-              <div className="muted" style={{ fontSize: 10, marginTop: 6 }}>{mine ? (isAdmin ? "You · Staff" : "You") : (isAdmin ? "Customer" : "Sumz Market Support")} · {new Date(item.created_at).toLocaleString()}</div>
+              <div className="muted" style={{ fontSize: 10, marginTop: 6 }}>{mine ? (isAdmin ? (isOwner ? "You · Owner" : "You · Staff") : "You") : (isAdmin ? "Customer" : "Sumz Market Support")} · {new Date(item.created_at).toLocaleString()}</div>
             </div>
           );
         })}
@@ -644,6 +653,12 @@ export default function OrderSupportChat({
         </div>
       ) : (
         <form onSubmit={sendMessage} style={{ display: "grid", gap: 9, marginTop: 12 }}>
+          {isOwner ? (
+            <label className="muted" style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 11px", border: "1px solid #704191", borderRadius: 10, background: "#1b1025" }}>
+              <input type="checkbox" checked={ownerOnly} onChange={event => setOwnerOnly(event.target.checked)} disabled={busy} />
+              <span><b style={{ color: "#e4c6ff" }}>Private delivery details</b> — only you and the customer can see this message or its attachments. Staff cannot view it.</span>
+            </label>
+          ) : null}
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, alignItems: "stretch" }}>
             <textarea
               className="input"
@@ -695,7 +710,7 @@ export default function OrderSupportChat({
         </form>
       )}
       {message ? <div className="muted" role="status" style={{ marginTop: 8 }}>{message}</div> : null}
-      <p className="muted" style={{ marginTop: 8 }}>Messages are visible only to this customer and authorized store staff.</p>
+      <p className="muted" style={{ marginTop: 8 }}>Customers and authorized staff can see regular chat messages. Private delivery details sent by the owner are visible only to the owner and that customer.</p>
       {vouchPanel}
     </section>
   );

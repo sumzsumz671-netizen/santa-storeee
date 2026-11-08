@@ -269,7 +269,7 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
                 <span className="market-group-arrow">↘</span>
               </div>
               <div className="market-product-grid">
-                {group.products.map(product => <ProductCard product={product} cosmeticImages={cosmeticImages} key={product.id} />)}
+                {group.products.map(product => <ProductCard product={product} cosmeticImages={cosmeticImages} purchaseBlocked={purchaseBlocked} key={product.id} />)}
               </div>
             </section>
           ))}

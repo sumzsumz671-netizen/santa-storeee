@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase";
 import InventorySearch from "../components/InventorySearch";
+import FortniteHeroSkins from "../components/FortniteHeroSkins";
 
 export const dynamic = "force-dynamic";
 
@@ -140,11 +141,7 @@ export default async function Home() {
             <div className="market-orbit market-orbit-one" />
             <div className="market-orbit market-orbit-two" />
             <div className="market-crown-halo" />
-            <img
-              className="market-hero-character"
-              src="/images/sumz-hero-skeleton.svg"
-              alt="Purple-lit skeleton character artwork from the Sumz Market theme"
-            />
+            <FortniteHeroSkins />
             <div className="market-floating-card market-floating-top"><span>✦</span><div><b>Premium drops</b><small>New stock, ready to shop</small></div></div>
             <div className="market-floating-card market-floating-bottom"><span>⚡</span><div><b>Instant checkout</b><small>Secure order processing</small></div></div>
             <div className="market-visual-caption">SUMZ MARKET <span>✦ EST. 2021</span></div>

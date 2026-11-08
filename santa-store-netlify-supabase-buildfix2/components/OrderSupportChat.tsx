@@ -368,6 +368,7 @@ export default function OrderSupportChat({
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
       setVouchBusy(false);
+      setVouchBusy(false);
       setVouchMessage("Please sign in again before leaving a vouch.");
       return;
     }

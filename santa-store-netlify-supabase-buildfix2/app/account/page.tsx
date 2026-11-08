@@ -39,6 +39,8 @@ export default function Account() {
   const [message, setMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [role, setRole] = useState("customer");
+  const [purchaseBlocked, setPurchaseBlocked] = useState(false);
+  const [purchaseBlockReason, setPurchaseBlockReason] = useState("");
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -56,7 +58,7 @@ export default function Account() {
     }
     setUserEmail(userResult.user.email ?? "");
     const [{ data: profile }, { data: orderRows, error: orderError }, { data: walletRows, error: walletError }, { data: conversationRows, error: conversationError }] = await Promise.all([
-      supabase.from("profiles").select("role,wallet_balance_cents").eq("id", userResult.user.id).maybeSingle(),
+      supabase.from("profiles").select("role,wallet_balance_cents,purchase_blocked,purchase_block_reason").eq("id", userResult.user.id).maybeSingle(),
       supabase
         .from("orders")
         .select("id,order_number,status,payment_method,total_cents,created_at,payment_reported_at,order_items(id,product_name,quantity,unit_price_cents)")
@@ -67,6 +69,8 @@ export default function Account() {
       supabase.from("support_conversations").select("id,order_id").order("updated_at", { ascending: false }),
     ]);
     setRole(profile?.role ?? "customer");
+    setPurchaseBlocked(profile?.purchase_blocked === true);
+    setPurchaseBlockReason(profile?.purchase_block_reason ?? "");
     setBalance(Number(profile?.wallet_balance_cents ?? 0));
     setOrders((orderRows ?? []) as Order[]);
     setTransactions((walletRows ?? []) as WalletTransaction[]);
@@ -85,6 +89,8 @@ export default function Account() {
         setConversationsByOrder({});
         setBalance(0);
         setRole("customer");
+        setPurchaseBlocked(false);
+        setPurchaseBlockReason("");
       } else {
         setUserEmail(session.user.email ?? "");
         window.setTimeout(() => void loadDashboard(), 0);
@@ -152,6 +158,8 @@ export default function Account() {
     setTransactions([]);
     setBalance(0);
     setUserEmail("");
+    setPurchaseBlocked(false);
+    setPurchaseBlockReason("");
   }
 
   return (
@@ -168,6 +176,14 @@ export default function Account() {
           <div className="eyebrow">CUSTOMER ACCOUNT</div>
           <h1 style={{ fontSize: 34, margin: "8px 0" }}>Welcome back</h1>
           <p className="muted">Your orders and account information in one place.</p>
+
+          {purchaseBlocked ? (
+            <div className="notice" role="alert" style={{ marginTop: 18, borderColor: "#9f3434", background: "#2a1113", color: "#fecaca" }}>
+              <b>Purchasing is disabled for this account.</b>
+              <div style={{ marginTop: 5 }}>You can still sign in to view your existing orders and contact support.</div>
+              {purchaseBlockReason ? <div style={{ marginTop: 5 }}>Reason: {purchaseBlockReason}</div> : null}
+            </div>
+          ) : null}
 
           <div className="grid" style={{ marginTop: 24, gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
             <div className="product pbody">

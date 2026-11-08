@@ -126,10 +126,10 @@ export default async function Home() {
           <div className="market-hero-grid" />
           <div className="market-hero-copy">
             <div className="market-trust-pill"><span>✦</span> VERIFIED SINCE 2021</div>
-            <p className="market-kicker">YOUR DIGITAL MARKETPLACE</p>
+            <p className="market-kicker">FORTNITE ACCOUNTS · RARE COSMETICS · MORE</p>
             <h1>SUMZ <span>MARKET</span></h1>
             <p className="market-hero-description">
-              Cheap, instant, and trusted digital accounts. Find your next favorite drop at Sumz Market.
+              Drop into the Sumz Market for Fortnite accounts, rare cosmetics, V-Bucks, and more. Find your next favorite drop.
             </p>
             <div className="market-hero-actions">
               <a className="market-primary-button" href="#inventory">Shop Now <span>→</span></a>
@@ -147,8 +147,8 @@ export default async function Home() {
             <div className="market-visual-caption">SUMZ MARKET <span>✦ EST. 2021</span></div>
           </div>
           <div className="market-hero-bottom">
-            <span>BUILT FOR THE COMMUNITY</span>
-            <span>ACCOUNTS <i>·</i> NITRO <i>·</i> BOOSTS <i>·</i> MORE</span>
+            <span>YOUR NEXT DROP STARTS HERE</span>
+            <span>FORTNITE <i>·</i> V-BUCKS <i>·</i> NITRO <i>·</i> MORE</span>
           </div>
         </section>
 
@@ -162,9 +162,9 @@ export default async function Home() {
         <section className="market-inventory section" id="inventory">
           <div className="market-section-heading">
             <div>
-              <div className="market-section-kicker"><span>✦</span> THE COLLECTION</div>
-              <h2>Featured <span>inventory</span></h2>
-              <p>Explore the latest listings available in the Sumz Market store.</p>
+              <div className="market-section-kicker"><span>✦</span> THE ITEM SHOP</div>
+              <h2>Featured <span>drops</span></h2>
+              <p>Browse available Fortnite accounts, rare cosmetics, and other digital drops.</p>
             </div>
             <div className="market-listing-count"><strong>{products.length.toLocaleString()}</strong><span>ACTIVE LISTINGS</span></div>
           </div>

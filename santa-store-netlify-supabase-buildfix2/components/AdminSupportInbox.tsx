@@ -228,9 +228,9 @@ export default function AdminSupportInbox({ isOwner = false }: { isOwner?: boole
     <section style={{ marginTop: 42 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <div>
-          <div className="eyebrow">CUSTOMER SUPPORT</div>
-          <h2 style={{ fontSize: 25, margin: "7px 0" }}>1-on-1 customer chats</h2>
-          <p className="muted">Verify payments and reply to customers. Owner-only delivery details are hidden from staff accounts.</p>
+          <div className="eyebrow">LIVE SUPPORT CENTER</div>
+          <h2 style={{ fontSize: 25, margin: "7px 0" }}>Buyer support inbox</h2>
+          <p className="muted">Manage buyer conversations, verify payments, and resolve order issues. Owner-only delivery details stay private.</p>
         </div>
         <button className="btn secondary" type="button" onClick={() => void loadInbox()} disabled={loading}>
           {loading ? "Refreshing…" : "Refresh chats"}
@@ -241,7 +241,7 @@ export default function AdminSupportInbox({ isOwner = false }: { isOwner?: boole
 
       <div className="grid" style={{ marginTop: 16, gridTemplateColumns: "minmax(220px,0.8fr) minmax(300px,1.5fr)", alignItems: "start" }}>
         <div className="product pbody" style={{ display: "grid", gap: 8 }}>
-          <b>Inbox ({items.length})</b>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}><b>Conversations</b><span className="pill">{items.filter(item => item.conversation.status === "open").length} open</span></div>
           {loading && items.length === 0 ? <div className="muted">Loading chats…</div> : items.length === 0 ? (
             <div className="muted">No customers have opened a payment chat yet. New conversations appear here.</div>
           ) : items.map(item => {
@@ -254,8 +254,8 @@ export default function AdminSupportInbox({ isOwner = false }: { isOwner?: boole
                 onClick={() => setSelectedId(item.conversation.id)}
                 style={{
                   width: "100%", textAlign: "left", padding: 12, borderRadius: 10, cursor: "pointer",
-                  border: active ? "1px solid #ef4444" : "1px solid #393940",
-                  background: active ? "#351318" : "#111114", color: "#fff",
+                  border: active ? "1px solid #8dff48" : "1px solid #253d29",
+                  background: active ? "linear-gradient(145deg,#142716,#0b160d)" : "#090f0a", color: "#f5fff2",
                 }}
               >
                 <b style={{ display: "block", overflowWrap: "anywhere" }}>{item.profile?.email ?? "Customer"}</b>

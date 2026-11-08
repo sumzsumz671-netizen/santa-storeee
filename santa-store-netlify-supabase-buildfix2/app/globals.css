@@ -463,3 +463,95 @@ button, input, select, textarea { font: inherit; }
   .market-product-image-stack img { height: 82px; }
   .market-product-fallback { height: 90px; }
 }
+
+
+/* Real Fortnite in-game cosmetic renders in the storefront hero */
+.market-hero-skin-stage {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 520px);
+  height: 390px;
+  align-self: end;
+  display: block;
+  overflow: visible;
+}
+.market-hero-skin-glow {
+  position: absolute;
+  inset: 18% 12% 4%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse,rgba(168,85,247,.36),rgba(50,79,190,.16) 48%,transparent 73%);
+  filter: blur(24px);
+}
+.market-hero-skin-wrap {
+  position: absolute;
+  bottom: 2%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  height: 86%;
+  min-width: 0;
+  filter: drop-shadow(0 14px 24px rgba(0,0,0,.48));
+  animation: market-skin-float 5s ease-in-out infinite;
+}
+.market-hero-skin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+.market-hero-skin-wrap>span {
+  position: absolute;
+  bottom: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 9px;
+  border: 1px solid rgba(216,168,255,.42);
+  border-radius: 999px;
+  background: rgba(12,7,22,.78);
+  color: #f4e8ff;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  box-shadow: 0 5px 18px rgba(0,0,0,.25);
+}
+.market-hero-skin-wrap-0 {
+  left: -2%;
+  width: 42%;
+  height: 78%;
+  z-index: 1;
+  animation-delay: -.9s;
+}
+.market-hero-skin-wrap-1 {
+  left: 28%;
+  width: 45%;
+  height: 98%;
+  z-index: 3;
+  animation-delay: -2.2s;
+}
+.market-hero-skin-wrap-2 {
+  right: -2%;
+  width: 40%;
+  height: 76%;
+  z-index: 2;
+  animation-delay: -3.4s;
+}
+@keyframes market-skin-float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+@media(max-width:900px) {
+  .market-hero-skin-stage { height: 340px; }
+  .market-hero-skin-wrap>span { font-size: 8px; }
+}
+@media(max-width:650px) {
+  .market-hero-skin-stage { width: 100%; height: 245px; margin: 0 auto; }
+  .market-hero-skin-wrap-0 { left: 0; width: 40%; height: 79%; }
+  .market-hero-skin-wrap-1 { left: 29%; width: 43%; height: 99%; }
+  .market-hero-skin-wrap-2 { right: 0; width: 38%; height: 77%; }
+  .market-hero-skin-wrap>span { bottom: 2px; padding: 4px 6px; font-size: 7px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .market-hero-skin-wrap { animation: none; }
+}

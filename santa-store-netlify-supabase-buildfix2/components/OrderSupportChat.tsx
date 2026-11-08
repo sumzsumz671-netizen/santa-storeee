@@ -55,6 +55,7 @@ export default function OrderSupportChat({
   const [vouchFeedback, setVouchFeedback] = useState("");
   const [vouchPhoto, setVouchPhoto] = useState<File | null>(null);
   const [vouchPhotoPreview, setVouchPhotoPreview] = useState("");
+  const [existingVouchPhotoUrl, setExistingVouchPhotoUrl] = useState("");
   const [vouchMessage, setVouchMessage] = useState("");
   const [existingVouch, setExistingVouch] = useState<{
     id: string;
@@ -92,6 +93,10 @@ export default function OrderSupportChat({
             customer_discord_tag: string;
             discord_status: "pending" | "sending" | "sent" | "failed";
           });
+          if (data.photo_path) {
+            const { data: signed } = await supabase.storage.from("vouch-photos").createSignedUrl(data.photo_path, 60 * 60);
+            if (active) setExistingVouchPhotoUrl(signed?.signedUrl ?? "");
+          }
         }
         setVouchLoading(false);
       }
@@ -551,6 +556,7 @@ export default function OrderSupportChat({
         <div className="notice" style={{ marginTop: 12 }}>
           <b>Your vouch: {existingVouch.rating}/5</b>
           <p style={{ margin: "6px 0" }}>{existingVouch.feedback}</p>
+          {existingVouchPhotoUrl ? <a href={existingVouchPhotoUrl} target="_blank" rel="noopener noreferrer"><img src={existingVouchPhotoUrl} alt="Your submitted purchase proof" style={{ maxWidth: 220, maxHeight: 180, objectFit: "contain", borderRadius: 10, border: "1px solid #477d35", marginTop: 8 }} /></a> : null}
           <div className="muted">
             {existingVouch.discord_status === "sent"
               ? "Published to Discord."

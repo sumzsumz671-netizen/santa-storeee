@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import "./admin-theme.css";
 import { supabase } from "../../lib/supabase";
 import AdminSupportInbox from "../../components/AdminSupportInbox";
 import AdminWalletTopups from "../../components/AdminWalletTopups";
@@ -196,7 +197,7 @@ export default function Admin() {
   const canManage = role === "owner" || role === "admin" || role === "staff";
 
   return (
-    <main className="wrap">
+    <main className="wrap admin-shell">
       <nav className="nav">
         <a className="logo" href="/">🎄 SANTA<span>STORE</span> <span style={{ color: "#a1a1aa", fontSize: 13 }}>ADMIN</span></a>
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>

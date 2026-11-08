@@ -63,6 +63,7 @@ export default function OrderSupportChat({
     feedback: string;
     customer_discord_tag: string;
     discord_status: "pending" | "sending" | "sent" | "failed";
+    photo_path: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export default function OrderSupportChat({
             feedback: string;
             customer_discord_tag: string;
             discord_status: "pending" | "sending" | "sent" | "failed";
+            photo_path: string | null;
           });
           if (data.photo_path) {
             const { data: signed } = await supabase.storage.from("vouch-photos").createSignedUrl(data.photo_path, 60 * 60);

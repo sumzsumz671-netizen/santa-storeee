@@ -5,6 +5,7 @@ import { supabase } from "../../lib/supabase";
 import AdminSupportInbox from "../../components/AdminSupportInbox";
 import AdminWalletTopups from "../../components/AdminWalletTopups";
 import AdminStaffManagement from "../../components/AdminStaffManagement";
+import AdminCustomerModeration from "../../components/AdminCustomerModeration";
 
 type Product = {
   id: string; name: string; slug: string; description: string | null;
@@ -238,6 +239,8 @@ export default function Admin() {
           {message ? <div className="notice" role="status" style={{ marginTop: 18 }}>{message}</div> : null}
 
           {role === "owner" ? <AdminStaffManagement /> : null}
+
+          {role === "owner" || role === "admin" ? <AdminCustomerModeration /> : null}
 
           <AdminSupportInbox isOwner={role === "owner"} />
 

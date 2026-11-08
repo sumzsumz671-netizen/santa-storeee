@@ -79,7 +79,7 @@ export default function OrderSupportChat({
       setVouchLoading(true);
       const { data, error } = await supabase
         .from("order_vouches")
-        .select("id,rating,feedback,customer_discord_tag,discord_status")
+        .select("id,rating,feedback,customer_discord_tag,discord_status,photo_path")
         .eq("order_id", orderId)
         .maybeSingle();
 

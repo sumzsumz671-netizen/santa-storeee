@@ -19,6 +19,7 @@ type VouchRecord = {
   feedback: string;
   customer_discord_tag: string;
   discord_status: "pending" | "sending" | "sent" | "failed";
+  photo_path: string;
   created_at: string;
   orders: OrderRecord;
 };
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
 
   const { data, error } = await supabase
     .from("order_vouches")
-    .select("id,user_id,rating,feedback,customer_discord_tag,discord_status,created_at,orders!inner(order_number,status,order_items(product_name,quantity,unit_price_cents))")
+    .select("id,user_id,rating,feedback,customer_discord_tag,discord_status,photo_path,created_at,orders!inner(order_number,status,order_items(product_name,quantity,unit_price_cents))")
     .eq("id", body.vouchId)
     .eq("user_id", userResult.user.id)
     .single();
@@ -75,6 +76,9 @@ export async function POST(request: Request) {
 
   const vouch = data as unknown as VouchRecord;
   const order = vouch.orders;
+  if (!vouch.photo_path) {
+    return Response.json({ error: "A purchase photo is required before this vouch can be published." }, { status: 422 });
+  }
   if (order.status !== "completed") {
     return Response.json({ error: "Only completed purchases can be posted as verified buyer vouches." }, { status: 403 });
   }
@@ -138,6 +142,14 @@ export async function POST(request: Request) {
     timestamp: vouchDate.toISOString(),
   };
 
+  const { data: photoSigned, error: photoError } = await supabase.storage
+    .from("vouch-photos")
+    .createSignedUrl(vouch.photo_path, 60 * 60);
+  if (photoError || !photoSigned?.signedUrl) {
+    await supabase.from("order_vouches").update({ discord_status: "failed" }).eq("id", vouch.id);
+    return Response.json({ error: "The required vouch photo could not be loaded. Please contact support." }, { status: 500 });
+  }
+
   let webhookResponse: Response;
   try {
     const target = new URL(webhookUrl);
@@ -148,7 +160,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         username: "Sumz Market",
         content,
-        embeds: [embed],
+        embeds: [{ ...embed, image: { url: photoSigned.signedUrl } }],
         allowed_mentions: { parse: [] },
       }),
       cache: "no-store",

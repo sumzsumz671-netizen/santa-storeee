@@ -23,6 +23,7 @@ type Product = {
 const money = (cents: number) => "$" + (cents / 100).toFixed(2);
 
 const inventoryGroups = [
+  { category: "FLASH SALE", title: "🔥 FLASH SALE", subtitle: "Limited account drops · $3.50 each · 12 listings", accent: "green" },
   {
     category: "NFA — Skinned Random Accounts",
     title: "NFA Skinned Accounts",

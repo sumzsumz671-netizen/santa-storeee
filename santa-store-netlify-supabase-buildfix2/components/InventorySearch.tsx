@@ -20,10 +20,13 @@ function skinNames(p:Product):string[]{
    .replace(/\s+FA\b/i,"")
    .replace(/\s+Stacked$/i,"")
    .replace(/\s*\([^)]*\)\s*/g," ")
+   // Remove seller notes such as "idk pin" without discarding the skin name.
+   .replace(/\b(idk|no pin|unknown pin|pin)\b/gi," ")
+   .replace(/\s+/g," ")
    .trim());
  return [...new Set(cleaned
    .filter(x=>x.length>=4&&x.length<=60)
-   .filter(x=>!/(inactive|last match|days ago|save the world|v[- ]?bucks|skins?|account|bundle|random|no pin|unknown|idk|emote|emoji|pickaxe|glider|all links|playstation|xbox|pc\/|pc$|nintendo|banner icon|new stw|fp\d+)/i.test(x))
+   .filter(x=>!/(inactive|last match|days ago|save the world|v[- ]?bucks|skins?|account|bundle|random|unknown|emote|emoji|pickaxe|glider|all links|playstation|xbox|pc\/|pc$|nintendo|banner icon|new stw|fp\d+)/i.test(x))
    .map(x=>ALIASES[x.toLowerCase()]||x))].slice(0,12);
 }
 function ProductCard({product,purchaseBlocked,cosmeticImages}:{product:Product;purchaseBlocked:boolean;cosmeticImages:Record<string,string>}){const fa=product.category==="Fortnite FA Accounts",sold=product.stock_count===0;const image=categoryArt(product.category||product.name);const skins=skinNames(product).map(n=>cosmeticImages[n]).filter(Boolean).slice(0,3);return <article className="market-product"><div className="market-product-art has-product-image">{skins.length===1?<img className="market-product-image" src={skins[0]} alt={product.name}/>:skins.length>1?<div className="market-product-image-stack">{skins.map((url,i)=><img key={url} src={url} alt={product.name+" skin "+(i+1)}/>)}</div>:<img className="market-product-image market-product-fallback" src={image} alt={product.name}/>}<span className="market-product-badge">{product.badge||product.category||"Account"}</span></div><div className="market-product-body"><h3>{product.name}</h3>{product.description&&<p>{product.description}</p>}{fa?<div className="market-price-options"><div className="market-price-option"><span>No Warranty</span><strong>{money(product.price_cents)}</strong></div><div className="market-price-option"><span>With Warranty</span><strong>{product.warranty_price_cents===null?"—":money(product.warranty_price_cents)}</strong></div></div>:<div className="market-product-price">{money(product.price_cents)}</div>}<div className="market-stock">{sold?"Out of stock":product.stock_count===null?(product.stock_label||"Stock not listed"):product.stock_count+" in stock"}</div>{sold?<div>Unavailable</div>:purchaseBlocked?<div>Purchasing disabled</div>:<div className="market-buy-actions"><BuyWithBalance productId={product.id} warrantyPriceCents={product.warranty_price_cents}/><ManualCheckout productId={product.id} productName={product.name} priceCents={product.price_cents} warrantyPriceCents={product.warranty_price_cents}/></div>}</div></article>}

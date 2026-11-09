@@ -1286,3 +1286,32 @@ body {
 .sumz-category-art .sumz-category-brand-art{position:absolute;right:8%;top:12%;width:72%;height:76%;object-fit:contain;opacity:.94;filter:drop-shadow(0 0 22px #39ff1430)}
 .sumz-category-art:has(.sumz-category-brand-art){inset:0 0 0 35%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#18251b50,transparent 72%)}
 .sumz-category-card:has(.sumz-category-brand-art) .sumz-category-content{background:linear-gradient(90deg,#030603 0%,#030603ed 35%,#03060385 62%,transparent 100%)}
+
+
+/* Prime-inspired storefront refresh — Sumz Market black/neon green */
+:root { --sumz-prime-accent:#9cff00; --sumz-prime-bg:#080a09; }
+body { background:#080a09!important; color:#f3f5f2!important; }
+.market-top { background:rgba(8,10,9,.92)!important; border-bottom:1px solid rgba(156,255,0,.13)!important; backdrop-filter:blur(18px); }
+.market-nav { max-width:1320px!important; }
+.market-brand-mark { background:linear-gradient(135deg,#a8ff00,#5ca800)!important; color:#070907!important; box-shadow:0 0 24px rgba(156,255,0,.18)!important; }
+.market-brand-words span { color:#9cff00!important; }
+.market-nav-links a { border-radius:9px!important; transition:all .2s ease; }
+.market-nav-links a:hover,.market-nav-active { color:#a5ff00!important; background:rgba(156,255,0,.08)!important; }
+.market-wrap { max-width:1320px!important; }
+.market-hero { border:1px solid rgba(156,255,0,.14)!important; border-radius:20px!important; background:radial-gradient(ellipse at 80% 20%,rgba(126,201,0,.12),transparent 45%),linear-gradient(145deg,#111510,#080a09 68%)!important; box-shadow:0 22px 70px rgba(0,0,0,.32)!important; }
+.market-trust-pill { border:1px solid rgba(156,255,0,.22)!important; background:rgba(156,255,0,.06)!important; color:#b8ff58!important; border-radius:99px!important; }
+.market-hero h1 span,.market-section-heading h2 span { color:#9cff00!important; }
+.market-primary-button,.market-discord-button { background:#9cff00!important; color:#090c06!important; border:0!important; border-radius:10px!important; font-weight:800!important; box-shadow:0 8px 24px rgba(156,255,0,.12)!important; }
+.market-primary-button:hover,.market-discord-button:hover { background:#b6ff43!important; transform:translateY(-1px); }
+.market-features { gap:12px!important; }
+.market-feature { border:1px solid #20251e!important; background:#10130f!important; border-radius:13px!important; padding:18px!important; }
+.market-feature-icon { color:#a4ff00!important; background:rgba(156,255,0,.08)!important; border-radius:10px!important; }
+.market-section-kicker { color:#a4ff00!important; }
+.market-inventory,.market-support-banner { border-color:#20251e!important; }
+.market-support-banner { background:linear-gradient(120deg,#111510,#0b0e0a)!important; border:1px solid #242a20!important; border-radius:16px!important; }
+.market-support-icon { color:#9cff00!important; background:rgba(156,255,0,.08)!important; border-radius:12px!important; }
+.market-footer { border-top:1px solid #20251e!important; }
+.market-footer a:hover { color:#a4ff00!important; }
+/* Keep cards readable and consistent with Prime's restrained product grid */
+.market-product-card,.inventory-product-card,.product-card { background:#10130f!important; border:1px solid #252a22!important; border-radius:14px!important; }
+.market-product-card:hover,.inventory-product-card:hover,.product-card:hover { border-color:rgba(156,255,0,.45)!important; box-shadow:0 12px 35px rgba(0,0,0,.28)!important; }

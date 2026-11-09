@@ -1239,3 +1239,15 @@ body {
 .market-hero{min-height:390px}
 .market-hero-visual{background:radial-gradient(ellipse at 50% 55%,#0053a633,transparent 60%)}
 @media(max-width:760px){.market-catalog-toolbar{grid-template-columns:1fr}.market-category-sidebar{position:static;grid-column:1;grid-row:2;flex-direction:row;flex-wrap:wrap}.market-search-wrap{grid-column:1;grid-row:1}.market-category-sidebar a{padding:8px}.market-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Category click -> grouped product gallery modal */
+.market-category-sidebar a{display:flex;justify-content:space-between;align-items:center;gap:8px}.market-category-sidebar a span{font-size:10px;color:#36cfff;background:#062642;border-radius:20px;padding:3px 7px}
+.market-category-modal-backdrop{position:fixed;inset:0;z-index:9999;background:rgba(0,3,12,.82);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:22px}
+.market-category-modal{width:min(1120px,96vw);max-height:88vh;overflow:auto;background:#071226;border:1px solid #16416a;border-radius:18px;box-shadow:0 30px 100px #000b; color:#f3f8ff}
+.market-category-modal>header{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:18px 22px;background:#08152a;border-bottom:1px solid #17324f}
+.market-category-modal h2{font-size:18px;margin:0;font-weight:800}.market-category-modal>header button{font-size:28px;line-height:1;background:transparent;border:0;color:#b8d2ef;cursor:pointer}
+.market-category-modal-grid{padding:20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;align-items:start}
+.market-category-modal-grid .market-product{min-width:0}.market-category-modal-grid .market-product-art{height:145px}.market-category-modal-grid .market-product-body{padding:14px}
+@media(max-width:900px){.market-category-modal-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.market-category-modal-backdrop{padding:8px}.market-category-modal{max-height:94vh}.market-category-modal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px}.market-category-modal-grid .market-product-art{height:110px}}

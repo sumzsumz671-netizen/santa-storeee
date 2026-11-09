@@ -145,7 +145,8 @@ function ProductCard({ product, cosmeticImages, purchaseBlocked }: { product: Pr
 export default function InventorySearch({ groups }: { groups: InventoryGroup[] }) {
   const [query, setQuery] = useState("");
   const [cosmeticImages, setCosmeticImages] = useState<Record<string, string>>({});
-  const [purchaseBlocked, setPurchaseBlocked] = useState(false);\n  const [activeCategory, setActiveCategory] = useState<InventoryGroup | null>(null);
+  const [purchaseBlocked, setPurchaseBlocked] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<InventoryGroup | null>(null);
   const cosmeticNames = useMemo(
     () => [...new Set(groups.flatMap(group => group.products.flatMap(productCosmeticNames)))],
     [groups]

@@ -1251,3 +1251,6 @@ body {
 .market-category-modal-grid .market-product{min-width:0}.market-category-modal-grid .market-product-art{height:145px}.market-category-modal-grid .market-product-body{padding:14px}
 @media(max-width:900px){.market-category-modal-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.market-category-modal-backdrop{padding:8px}.market-category-modal{max-height:94vh}.market-category-modal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px}.market-category-modal-grid .market-product-art{height:110px}}
+
+
+.market-category-sidebar button{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;width:100%;font:inherit;font-size:13px;color:#9bb4d1;padding:10px;border-radius:8px;border:1px solid transparent;background:transparent;cursor:pointer}.market-category-sidebar button:hover{color:#eafaff;background:#073052;border-color:#0c5b91}.market-category-sidebar button span{font-size:10px;color:#36cfff;background:#062642;border-radius:20px;padding:3px 7px}

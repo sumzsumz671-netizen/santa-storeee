@@ -1256,3 +1256,22 @@ body {
 .market-category-sidebar button{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;width:100%;font:inherit;font-size:13px;color:#9bb4d1;padding:10px;border-radius:8px;border:1px solid transparent;background:transparent;cursor:pointer}.market-category-sidebar button:hover{color:#eafaff;background:#073052;border-color:#0c5b91}.market-category-sidebar button span{font-size:10px;color:#36cfff;background:#062642;border-radius:20px;padding:3px 7px}
 
 .market-open-category{border:1px solid #0877bd;background:#061b35;color:#26d7ff;border-radius:9px;padding:9px 13px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}.market-open-category:hover{background:#07345b;box-shadow:0 0 18px #00bfff30}.market-category-modal{z-index:10000}.market-category-modal-backdrop{z-index:99999}
+
+/* Sumz Market category-first storefront */
+.sumz-category-store{margin-top:24px}
+.sumz-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.sumz-category-card{position:relative;overflow:hidden;min-height:235px;text-align:left;cursor:pointer;padding:0;border:1px solid #39ff14;border-radius:17px;background:linear-gradient(130deg,#071007,#020402 65%);color:#fff;box-shadow:inset 0 0 24px #38ff1410,0 0 15px #39ff1415;transition:transform .2s,box-shadow .2s}
+.sumz-category-card:hover{transform:translateY(-4px);box-shadow:0 0 28px #39ff1435}
+.sumz-category-art{position:absolute;inset:0 0 0 42%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse,#39ff1420,transparent 70%)}
+.sumz-category-art img{width:100%;height:100%;object-fit:contain;opacity:.78;filter:drop-shadow(0 0 18px #39ff1440)}
+.sumz-category-content{position:relative;z-index:1;display:flex;flex-direction:column;min-height:235px;padding:22px;background:linear-gradient(90deg,#030603 0%,#030603ed 38%,transparent 100%)}
+.sumz-category-content small{font-size:10px;letter-spacing:2px;color:#65ff36;font-weight:800}
+.sumz-category-content h3{font-size:clamp(20px,2vw,30px);font-weight:900;text-transform:uppercase;margin:10px 0;color:#fff;max-width:65%;line-height:1.05}
+.sumz-category-content p{font-size:13px;color:#b6c5b2;max-width:60%;margin:0}
+.sumz-category-bottom{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:20px;font-size:11px;color:#a6b7a1}
+.sumz-category-bottom b{color:#39ff14;font-size:11px}
+.sumz-category-modal{background:#050805;border-color:#39ff14;box-shadow:0 30px 100px #000,0 0 25px #39ff1420}
+.sumz-category-modal>header{background:#050805;border-color:#183818}
+.market-category-modal h2{color:#39ff14}
+@media(max-width:900px){.sumz-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.sumz-category-grid{grid-template-columns:1fr}.sumz-category-card,.sumz-category-content{min-height:190px}.sumz-category-content h3,.sumz-category-content p{max-width:70%}}

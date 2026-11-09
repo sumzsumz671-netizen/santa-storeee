@@ -253,7 +253,7 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
             : "Search by product name, category, or description"}
         </div>
       </div>
-      <aside className="market-category-sidebar"><span className="market-sidebar-label">CATEGORIES</span><a href="#inventory" onClick={event => { event.preventDefault(); setActiveCategory(null); }}>All products</a>{groups.map(group => <a key={group.category} href={"#" + group.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")} onClick={event => { event.preventDefault(); setActiveCategory(group); }}>{group.title} <span>{group.products.length}</span></a>)}</aside>
+      <aside className="market-category-sidebar"><span className="market-sidebar-label">CATEGORIES</span><button type="button" onClick={() => setActiveCategory(null)}>All products</button>{groups.map(group => <button type="button" key={group.category} onClick={() => setActiveCategory(group)}>{group.title}<span>{group.products.length}</span></button>)}</aside>
       </div>
 
       {filteredGroups.length === 0 ? (

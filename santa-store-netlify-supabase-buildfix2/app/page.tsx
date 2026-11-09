@@ -101,7 +101,7 @@ export default async function Home() {
       accent: "purple",
       products: products.filter(product => (product.category?.trim() || "Uncategorized") === category),
     })),
-  ].filter(group => group.products.length > 0);
+  ];
 
   return (
     <>

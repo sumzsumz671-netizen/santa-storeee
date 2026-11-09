@@ -1254,3 +1254,5 @@ body {
 
 
 .market-category-sidebar button{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;width:100%;font:inherit;font-size:13px;color:#9bb4d1;padding:10px;border-radius:8px;border:1px solid transparent;background:transparent;cursor:pointer}.market-category-sidebar button:hover{color:#eafaff;background:#073052;border-color:#0c5b91}.market-category-sidebar button span{font-size:10px;color:#36cfff;background:#062642;border-radius:20px;padding:3px 7px}
+
+.market-open-category{border:1px solid #0877bd;background:#061b35;color:#26d7ff;border-radius:9px;padding:9px 13px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}.market-open-category:hover{background:#07345b;box-shadow:0 0 18px #00bfff30}.market-category-modal{z-index:10000}.market-category-modal-backdrop{z-index:99999}

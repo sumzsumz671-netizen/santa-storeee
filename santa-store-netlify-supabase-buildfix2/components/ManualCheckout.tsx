@@ -7,7 +7,7 @@ const METHODS = [
   { value: "cash_app", label: "Cash App" },
   { value: "paypal", label: "PayPal" },
   { value: "crypto", label: "Cryptocurrency" },
-  { value: "rewarble_gift_card", label: "Rewarble gift card" },
+  { value: "g2a_crypto", label: "G2A Gift Me Crypto" },
 ];
 
 const PAYMENT_DETAILS = {
@@ -197,10 +197,11 @@ export default function ManualCheckout({
             </div>
           ) : null}
 
-          {method === "rewarble_gift_card" ? (
+          {method === "g2a_crypto" ? (
             <div>
-              <b>Rewarble gift card</b>
-              <p className="muted">Open your private order chat from My Account and ask support for the current gift-card redemption instructions before submitting the code.</p>
+              <b>G2A Gift Me Crypto</b>
+              <p className="muted">Purchase crypto through G2A Gift Me Crypto, then send payment proof in your order chat so support can verify it.</p>
+              <a className="btn" href="https://www.g2a.com/pl/category/gift-me-crypto-c4071" target="_blank" rel="noopener noreferrer" style={{ width: "100%", marginTop: 10 }}>Open G2A Gift Me Crypto ↗</a>
             </div>
           ) : null}
 

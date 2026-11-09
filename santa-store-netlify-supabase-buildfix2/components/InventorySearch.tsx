@@ -88,16 +88,16 @@ function ProductCard({ product, cosmeticImages, purchaseBlocked }: { product: Pr
         <div className="market-product-glow" />
         {productImages.length > 0 ? (
           productImages.length === 1 ? (
-            <img className="market-product-image" src={productImages[0]} alt={product.name} loading="lazy" />
+            <img className="market-product-image" src={productImages[0]} alt={product.name} loading="lazy" onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackImage; }} />
           ) : (
             <div className="market-product-image-stack">
               {productImages.map((imageUrl, index) => (
-                <img key={imageUrl} src={imageUrl} alt={product.name + " item " + (index + 1)} loading="lazy" />
+                <img key={imageUrl} src={imageUrl} alt={product.name + " item " + (index + 1)} loading="lazy" onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackImage; }} />
               ))}
             </div>
           )
         ) : (
-          <img className="market-product-image market-product-fallback" src={fallbackImage} alt={product.name} loading="lazy" />
+          <img className="market-product-image market-product-fallback" src={fallbackImage} alt={product.name} loading="lazy" onError={event => { event.currentTarget.onerror = null; event.currentTarget.style.display = "none"; }} />
         )}
         <span className="market-product-badge">{product.badge || product.category || "Digital item"}</span>
       </div>

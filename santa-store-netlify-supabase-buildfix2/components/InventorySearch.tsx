@@ -226,8 +226,9 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
 
   return (
     <>
+      <div className="market-catalog-toolbar">
       <div className="market-search-wrap">
-        <label className="market-search-label" htmlFor="market-inventory-search">FIND YOUR NEXT ACCOUNT</label>
+        <label className="market-search-label" htmlFor="market-inventory-search">SEARCH PRODUCTS</label>
         <div className="market-search-box">
           <span className="market-search-icon" aria-hidden="true">⌕</span>
           <input
@@ -250,6 +251,8 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
             ? resultCount + " matching " + (resultCount === 1 ? "listing" : "listings")
             : "Search by product name, category, or description"}
         </div>
+      </div>
+      <aside className="market-category-sidebar"><span className="market-sidebar-label">CATEGORIES</span><a href="#inventory">All products</a>{groups.map(group => <a key={group.category} href={"#" + group.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>{group.title}</a>)}</aside>
       </div>
 
       {filteredGroups.length === 0 ? (

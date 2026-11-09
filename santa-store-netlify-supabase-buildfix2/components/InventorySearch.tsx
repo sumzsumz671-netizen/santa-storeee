@@ -145,7 +145,7 @@ function ProductCard({ product, cosmeticImages, purchaseBlocked }: { product: Pr
 export default function InventorySearch({ groups }: { groups: InventoryGroup[] }) {
   const [query, setQuery] = useState("");
   const [cosmeticImages, setCosmeticImages] = useState<Record<string, string>>({});
-  const [purchaseBlocked, setPurchaseBlocked] = useState(false);
+  const [purchaseBlocked, setPurchaseBlocked] = useState(false);\n  const [activeCategory, setActiveCategory] = useState<InventoryGroup | null>(null);
   const cosmeticNames = useMemo(
     () => [...new Set(groups.flatMap(group => group.products.flatMap(productCosmeticNames)))],
     [groups]
@@ -252,7 +252,7 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
             : "Search by product name, category, or description"}
         </div>
       </div>
-      <aside className="market-category-sidebar"><span className="market-sidebar-label">CATEGORIES</span><a href="#inventory">All products</a>{groups.map(group => <a key={group.category} href={"#" + group.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>{group.title}</a>)}</aside>
+      <aside className="market-category-sidebar"><span className="market-sidebar-label">CATEGORIES</span><a href="#inventory" onClick={event => { event.preventDefault(); setActiveCategory(null); }}>All products</a>{groups.map(group => <a key={group.category} href={"#" + group.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")} onClick={event => { event.preventDefault(); setActiveCategory(group); }}>{group.title} <span>{group.products.length}</span></a>)}</aside>
       </div>
 
       {filteredGroups.length === 0 ? (
@@ -279,6 +279,16 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
               </div>
             </section>
           ))}
+        </div>
+      )}
+      {activeCategory && (
+        <div className="market-category-modal-backdrop" role="presentation" onClick={() => setActiveCategory(null)}>
+          <section className="market-category-modal" role="dialog" aria-modal="true" aria-label={activeCategory.title + " products"} onClick={event => event.stopPropagation()}>
+            <header><h2>{activeCategory.title} Products</h2><button type="button" aria-label="Close category" onClick={() => setActiveCategory(null)}>×</button></header>
+            <div className="market-category-modal-grid">
+              {activeCategory.products.map(product => <ProductCard key={product.id} product={product} cosmeticImages={cosmeticImages} purchaseBlocked={purchaseBlocked} />)}
+            </div>
+          </section>
         </div>
       )}
     </>

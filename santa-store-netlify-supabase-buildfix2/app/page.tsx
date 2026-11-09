@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabase";
 import InventorySearch from "../components/InventorySearch";
 import FortniteHeroSkins from "../components/FortniteHeroSkins";
+import MarketAuthLinks from "../components/MarketAuthLinks";
 
 export const dynamic = "force-dynamic";
 
@@ -115,10 +116,9 @@ export default async function Home() {
             <a className="market-nav-active" href="/">Home</a>
             <a href="#inventory">Shop</a>
             <a href="/account">Support</a>
-            <a href="/account">My Account</a>
             <a className="market-nav-discord" href="https://discord.com/invite/sumz" target="_blank" rel="noopener noreferrer">Discord <span>↗</span></a>
           </div>
-          <a className="market-login" href="/account">Sign in <span>→</span></a>
+          <MarketAuthLinks />
         </nav>
       </header>
 

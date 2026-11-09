@@ -1282,3 +1282,7 @@ body {
 .sumz-category-card .sumz-category-content{background:linear-gradient(90deg,#030603 0%,#030603f2 35%,#03060385 62%,transparent 100%)}
 
 /* rebuild trigger: category skin artwork refresh */
+
+.sumz-category-art .sumz-category-brand-art{position:absolute;right:8%;top:12%;width:72%;height:76%;object-fit:contain;opacity:.94;filter:drop-shadow(0 0 22px #39ff1430)}
+.sumz-category-art:has(.sumz-category-brand-art){inset:0 0 0 35%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#18251b50,transparent 72%)}
+.sumz-category-card:has(.sumz-category-brand-art) .sumz-category-content{background:linear-gradient(90deg,#030603 0%,#030603ed 35%,#03060385 62%,transparent 100%)}

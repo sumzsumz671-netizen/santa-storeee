@@ -1280,3 +1280,5 @@ body {
 .sumz-category-art .sumz-category-skin{position:absolute;right:2%;bottom:0;width:62%;height:95%;object-fit:contain;opacity:1;filter:drop-shadow(0 8px 18px #39ff1450);mix-blend-mode:normal}
 .sumz-category-art:has(.sumz-category-skin){inset:0 0 0 35%;background:radial-gradient(ellipse at 60% 65%,#39ff142b,transparent 70%)}
 .sumz-category-card .sumz-category-content{background:linear-gradient(90deg,#030603 0%,#030603f2 35%,#03060385 62%,transparent 100%)}
+
+/* rebuild trigger: category skin artwork refresh */

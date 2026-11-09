@@ -1201,3 +1201,26 @@ body {
   font-weight: 850;
   text-align: center;
 }
+
+
+/* OG / rare Fortnite collection — classic gold + midnight blue styling */
+.market-og-group .market-group-heading { border-bottom-color: rgba(224,190,91,.48); }
+.market-og-group .market-group-count { color: #f4d77a; }
+.market-og-group .market-group-heading h3 { color: #fff4d1; text-shadow: 0 0 22px rgba(230,190,80,.15); }
+.market-og-group .market-group-heading p { color: #c4b58b; }
+.market-og-group .market-group-arrow { color: #f4d77a; }
+.market-og-group .market-product {
+  border-color: #66532b;
+  background: linear-gradient(155deg,#282313 0%,#17140c 70%,#0b0a06 100%);
+}
+.market-og-group .market-product:hover { border-color: #e8c65d; box-shadow: 0 16px 40px rgba(190,145,38,.18),0 0 22px rgba(245,205,83,.10); }
+.market-og-group .market-product-art,
+.market-og-group .market-product-art.has-product-image {
+  background: radial-gradient(ellipse at 50% 55%,rgba(211,174,66,.24),transparent 66%),linear-gradient(140deg,#49391a,#21190c 58%,#30220c);
+}
+.market-og-group .market-product-art:before { border-color: rgba(255,222,128,.23); }
+.market-og-group .market-product-glow { background:#f3c84f; opacity:.18; }
+.market-og-group .market-product-badge { border-color:rgba(255,222,128,.58);background:rgba(22,15,5,.9);color:#ffe59a; }
+.market-og-group .market-product-price { color:#ffdf78;text-shadow:0 0 22px rgba(245,205,83,.16); }
+.market-og-group .market-stock-dot { background:#e9c75d;box-shadow:0 0 10px rgba(233,199,93,.45); }
+.market-og-group .market-product-image,.market-og-group .market-product-image-stack img { filter:drop-shadow(0 7px 15px rgba(255,210,92,.22)); }

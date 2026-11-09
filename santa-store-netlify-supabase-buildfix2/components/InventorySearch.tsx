@@ -43,8 +43,11 @@ function productCosmeticNames(product: Product): string[] {
   const original = product.name.trim();
   if (/^OG Save The World$/i.test(original)) return [];
 
-  const cleaned = original.replace(/\s+FA$/i, "");
-  const parts = cleaned.split(/\s+\+\s+/);
+  const cleaned = original
+    .replace(/\s+FA$/i, "")
+    .replace(/^\d+\s+skins?\s*[·|:—-]\s*/i, "")
+    .replace(/^OG\s+STW\s+FP\d+\s*[·|:—-]\s*/i, "");
+  const parts = cleaned.split(/\s*(?:\+|[·|])\s*/);
   const names = parts
     .map(part => part.replace(/^OG\s+/i, "").replace(/\s+Stacked$/i, "").trim())
     .filter(part => part.length > 0)

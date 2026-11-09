@@ -262,7 +262,7 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
       ) : (
         <div className="market-inventory-groups">
           {filteredGroups.map(group => (
-            <section className="market-inventory-group" id={group.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")} key={group.category}>
+            <section className={"market-inventory-group" + (/og|rare season/i.test(group.category + " " + group.title) ? " market-og-group" : "")} id={group.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")} key={group.category}>
               <div className="market-group-heading">
                 <div>
                   <span className="market-group-count">{String(group.products.length).padStart(2, "0")} LISTINGS</span>

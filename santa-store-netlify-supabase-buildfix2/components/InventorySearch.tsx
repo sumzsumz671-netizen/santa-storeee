@@ -273,7 +273,7 @@ export default function InventorySearch({ groups }: { groups: InventoryGroup[] }
                   <h3>{group.title}</h3>
                   <p>{group.subtitle}</p>
                 </div>
-                <span className="market-group-arrow">↘</span>
+                <button type="button" className="market-group-arrow market-open-category" onClick={() => setActiveCategory(group)} aria-label={"View " + group.title + " products"}>View products ↗</button>
               </div>
               <div className="market-product-grid">
                 {group.products.map(product => <ProductCard product={product} cosmeticImages={cosmeticImages} purchaseBlocked={purchaseBlocked} key={product.id} />)}

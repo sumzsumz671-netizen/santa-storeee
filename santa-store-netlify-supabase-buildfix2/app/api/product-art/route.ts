@@ -11,7 +11,7 @@ type Cosmetic = {
 };
 
 const normalize = (value: string) =>
-  value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  value.normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 export const runtime = "nodejs";
 export const revalidate = 86400;
@@ -48,11 +48,21 @@ export async function GET(request: Request) {
 
     const payload = await response.json() as { data?: Cosmetic[] };
     const cosmetics = Array.isArray(payload.data) ? payload.data : [];
+    const indexed = cosmetics.map(item => ({ item, key: normalize(item.name) })).filter(x => x.key);
     const images: Record<string, string> = {};
 
     for (const name of names) {
       const key = normalize(name);
-      const match = cosmetics.find(item => normalize(item.name) === key);
+      if (!key) continue;
+
+      // Prefer exact cosmetic names. For account titles that include a cosmetic
+      // name plus extra inventory text, accept a unique contained-name match only.
+      let match = indexed.find(x => x.key === key)?.item;
+      if (!match && key.length >= 5) {
+        const candidates = indexed.filter(x => x.key.length >= 5 && (key.includes(x.key) || x.key.includes(key)));
+        if (candidates.length === 1) match = candidates[0].item;
+      }
+
       const image = match?.images?.featured ?? match?.images?.icon ?? match?.images?.smallIcon ?? match?.images?.large;
       if (image && /^https:\/\//i.test(image)) images[name] = image;
     }

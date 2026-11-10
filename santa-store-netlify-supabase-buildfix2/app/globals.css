@@ -1315,3 +1315,66 @@ body { background:#080a09!important; color:#f3f5f2!important; }
 /* Keep cards readable and consistent with Prime's restrained product grid */
 .market-product-card,.inventory-product-card,.product-card { background:#10130f!important; border:1px solid #252a22!important; border-radius:14px!important; }
 .market-product-card:hover,.inventory-product-card:hover,.product-card:hover { border-color:rgba(156,255,0,.45)!important; box-shadow:0 12px 35px rgba(0,0,0,.28)!important; }
+
+
+/* SellAuth-inspired parody storefront: compact SaaS header, crisp panels, clean catalog */
+:root{--sa-accent:#8b5cf6;--sa-accent2:#a78bfa;--sa-border:#262333;--sa-panel:#111019;--sa-muted:#9b96aa}
+body{background:#09080e!important;color:#f4f2fa!important}
+.market-top{background:rgba(9,8,14,.94)!important;border-bottom:1px solid #211e2d!important}
+.market-nav{max-width:1440px!important;min-height:68px!important;padding:10px 30px!important}
+.market-brand-mark{width:36px!important;height:36px!important;border-radius:9px!important;background:#8b5cf6!important;color:#fff!important;border:0!important;box-shadow:0 0 18px #8b5cf633!important}
+.market-brand-words{font-size:14px!important;letter-spacing:1.2px!important}
+.market-brand-words span{color:#a78bfa!important;letter-spacing:2.5px!important}
+.market-nav-links{gap:8px!important}
+.market-nav-links a{padding:10px 13px!important;border-radius:9px!important;font-size:12px!important;color:#aaa5b9!important}
+.market-nav-links .market-nav-active:after{display:none!important}
+.market-nav-links a:hover,.market-nav-links .market-nav-active{background:#171323!important;color:#c4b5fd!important}
+.market-login{background:#171323!important;border:1px solid #39304f!important;color:#e9e4f5!important;box-shadow:none!important;border-radius:9px!important;padding:10px 14px!important}
+.market-login span{color:#a78bfa!important}
+.market-wrap{max-width:1440px!important;padding:28px 30px!important}
+.market-hero{min-height:350px!important;border-radius:17px!important;border:1px solid #2b2639!important;background:radial-gradient(ellipse at 75% 30%,#38235a55,transparent 45%),linear-gradient(115deg,#14111d,#0c0a12 68%)!important;box-shadow:none!important}
+.market-hero-copy{padding:45px 0 50px 6%!important}
+.market-trust-pill{border-color:#39304f!important;background:#1a1526!important;color:#c4b5fd!important}
+.market-kicker{color:#a78bfa!important;letter-spacing:2.5px!important;margin-top:22px!important}
+.market-hero h1{font-size:clamp(42px,6vw,68px)!important;letter-spacing:-3px!important}
+.market-hero h1 span{background:none!important;-webkit-text-fill-color:#a78bfa!important;color:#a78bfa!important}
+.market-hero-description{font-size:14px!important;max-width:440px!important}
+.market-primary-button{background:#8b5cf6!important;color:#fff!important;border-radius:9px!important;box-shadow:none!important}
+.market-primary-button:hover{background:#7c3aed!important}
+.market-discord-button{background:#171323!important;border:1px solid #39304f!important;color:#e9e4f5!important;box-shadow:none!important;border-radius:9px!important}
+.market-hero-visual{min-height:320px!important}
+.market-crown-halo{background:radial-gradient(circle,#8b5cf633,#5b21a011 45%,transparent 70%)!important}
+.market-crown{color:#c4b5fd!important;text-shadow:0 0 30px #8b5cf666!important}
+.market-orbit{border-color:#8b5cf622!important}
+.market-floating-card{border-color:#302840!important;background:#14111d!important;box-shadow:none!important;border-radius:10px!important}
+.market-floating-card>span{background:#261c38!important;color:#c4b5fd!important}
+.market-hero-bottom{border-color:#272232!important;color:#827b91!important;background:#0d0b13!important}
+.market-features{margin:14px 0 48px!important;gap:10px!important}
+.market-feature{min-height:68px!important;background:#111019!important;border:1px solid #262333!important;border-radius:11px!important;box-shadow:none!important}
+.market-feature-icon{background:#211a31!important;color:#b9a2ff!important}
+.market-section-heading h2 span{color:#a78bfa!important}
+.market-section-kicker{color:#a78bfa!important}
+.market-listing-count{border:1px solid #262333!important;background:#111019!important;border-radius:10px!important}
+.market-inventory{border:0!important}
+.market-search-wrap{background:#111019!important;border:1px solid #262333!important;border-radius:12px!important;padding:15px!important}
+.market-search-label{color:#a78bfa!important}
+.market-search-box{background:#09080e!important;border:1px solid #292436!important;border-radius:9px!important}
+.market-search-input{color:#f4f2fa!important}
+.sumz-category-grid{gap:14px!important}
+.sumz-category-card{border:1px solid #292436!important;border-radius:13px!important;background:linear-gradient(135deg,#15121d,#0d0b12)!important;box-shadow:none!important;min-height:215px!important}
+.sumz-category-card:hover{border-color:#7050a8!important;box-shadow:0 8px 28px #0005!important}
+.sumz-category-content{min-height:215px!important;background:linear-gradient(90deg,#0d0b12 0%,#0d0b12ed 38%,#0d0b1280 68%,transparent 100%)!important;padding:19px!important}
+.sumz-category-content small{color:#b9a2ff!important;letter-spacing:1.5px!important}
+.sumz-category-content h3{font-size:clamp(18px,1.7vw,25px)!important}
+.sumz-category-bottom{color:#8e879e!important}
+.sumz-category-bottom b{color:#b9a2ff!important}
+.market-product{background:#111019!important;border:1px solid #262333!important;border-radius:12px!important;box-shadow:none!important}
+.market-product:hover{border-color:#574276!important;transform:translateY(-2px)}
+.market-product-badge{background:#211a31!important;color:#c4b5fd!important;border:1px solid #39304f!important}
+.market-product-price,.market-price-option strong{color:#c4b5fd!important}
+.market-buy-actions .btn,.market-buy-actions button{border-radius:8px!important}
+.market-support-banner{background:#111019!important;border:1px solid #262333!important;border-radius:13px!important}
+.market-support-icon{background:#211a31!important;color:#b9a2ff!important}
+.market-footer{max-width:1440px!important;border-color:#262333!important;color:#777184!important}
+.market-footer a:hover{color:#b9a2ff!important}
+@media(max-width:760px){.market-nav{padding:12px 16px!important}.market-nav-links{gap:2px!important}.market-nav-links a{padding:8px!important}.market-wrap{padding:16px!important}.market-hero{grid-template-columns:1fr!important}.market-hero-copy{padding:35px 24px 20px!important}.market-hero-visual{min-height:260px!important}.market-hero-bottom{flex-direction:column!important}.market-features{grid-template-columns:repeat(2,1fr)!important}.market-nav-discord{display:none!important}}

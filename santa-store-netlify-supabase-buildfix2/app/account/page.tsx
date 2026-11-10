@@ -312,6 +312,7 @@ export default function Account() {
               ))}
             </div>
           )}
+          </div>
         </section>
       ) : (
         <section style={{ maxWidth: 460, margin: "55px auto" }}>

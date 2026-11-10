@@ -1431,3 +1431,22 @@ body{background:#09080e!important;color:#f4f2fa!important}
 .sumz-crypto-tabs { display:flex;gap:6px; }.sumz-crypto-tabs button { flex:1;padding:8px;border:1px solid #2b3b54;border-radius:8px;background:#111d30;color:#9eb0ca;font-size:11px;font-weight:800;cursor:pointer; }.sumz-crypto-tabs button.active { border-color:#6c65e8;background:#24234a;color:#d9d5ff; }
 .sumz-payment-reference { margin-top:13px;padding-top:12px;border-top:1px solid #26364e; }.sumz-payment-reference>b { font-size:12px; }
 @media(max-width:600px) { .market-category-modal-backdrop { padding:8px; }.market-category-modal { max-height:calc(100vh - 16px); }.market-category-modal-grid { grid-template-columns:1fr; }.market-product-art { height:125px!important; }.sumz-payment-copy small { font-size:9px; } }
+
+
+/* Customer-facing Sumz support center */
+.sumz-support-center{margin:30px 0 26px;padding:18px;border:1px solid #28243f;border-radius:20px;background:linear-gradient(180deg,#100d1b,#0b0b12);color:#eef0ff}
+.sumz-support-hero{position:relative;overflow:hidden;padding:28px;border:1px solid #352650;border-radius:16px;background:radial-gradient(ellipse at 90% 0%,#38205b55,transparent 45%),linear-gradient(120deg,#171126,#10101a)}
+.sumz-support-orb{display:grid;place-items:center;width:42px;height:42px;margin-bottom:16px;border-radius:12px;background:linear-gradient(135deg,#9852f5,#5c37c9);color:#fff;font-size:22px;box-shadow:0 8px 24px #6b35bb44}
+.sumz-support-eyebrow{color:#b99aff;font-size:10px;font-weight:900;letter-spacing:2px}
+.sumz-support-hero h2{margin:8px 0;font-size:clamp(25px,4vw,34px);font-weight:850;letter-spacing:-.8px}
+.sumz-support-hero p{max-width:540px;margin:0;color:#9ca2ba;font-size:13px;line-height:1.7}
+.sumz-support-cta{display:inline-flex;align-items:center;gap:22px;margin-top:18px;padding:11px 15px;border-radius:10px;background:#7444d9;color:white!important;font-size:12px;font-weight:800;text-decoration:none!important}
+.sumz-support-cta:hover{background:#8758eb}
+.sumz-support-topics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:13px 0}
+.sumz-support-topic{position:relative;display:flex;flex-direction:column;gap:6px;min-height:122px;padding:14px;border:1px solid #28243a;border-radius:13px;background:#11101a;text-decoration:none!important;transition:.18s}
+.sumz-support-topic:hover{border-color:#6945a5;background:#171326;transform:translateY(-2px)}
+.sumz-topic-icon{display:grid;place-items:center;width:30px;height:30px;margin-bottom:5px;border-radius:9px;background:#2a1c40;color:#c4a3ff;font-size:15px;font-weight:900}
+.sumz-support-topic b{color:#e9e8f4;font-size:12px}.sumz-support-topic small{color:#85869f;font-size:10px;line-height:1.4}.sumz-topic-arrow{position:absolute;right:12px;top:12px;color:#75639a;font-size:12px}
+.sumz-ticket-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:24px 0 10px}.sumz-ticket-head h3{margin:5px 0;font-size:21px;font-weight:850}.sumz-ticket-head p{margin:0;color:#8d91a8;font-size:12px}.sumz-ticket-count{padding:7px 10px;border:1px solid #3a2c55;border-radius:99px;background:#211733;color:#c5a9ff;font-size:10px;font-weight:800}
+.sumz-ticket-note{padding:12px 14px;border:1px solid #29243b;border-radius:11px;background:#11101a;color:#999ab0;font-size:11px;line-height:1.65}.sumz-ticket-note b{color:#c7b3ff}
+@media(max-width:760px){.sumz-support-topics{grid-template-columns:repeat(2,minmax(0,1fr))}.sumz-support-center{padding:12px}.sumz-support-hero{padding:20px}.sumz-ticket-head{align-items:flex-start}}

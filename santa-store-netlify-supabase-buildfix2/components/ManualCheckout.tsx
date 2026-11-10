@@ -180,7 +180,7 @@ export default function ManualCheckout({
 
           {method === "crypto" ? (
             <div style={{ display: "grid", gap: 12 }}>
-              <div className="sumz-crypto-tabs">{(["ltc","btc","sol"] as const).map((coin)=><button type="button" className={selectedCrypto===coin?"active":""} key={coin} onClick={()=>setSelectedCrypto(coin}>{coin.toUpperCase()}</button>)}</div>
+              <div className="sumz-crypto-tabs">{(["ltc","btc","sol"] as const).map((coin)=><button type="button" className={selectedCrypto===coin?"active":""} key={coin} onClick={()=>setSelectedCrypto(coin)}>{coin.toUpperCase()}</button>)}</div>
               {[PAYMENT_DETAILS[selectedCrypto]].map(wallet => (
                 <div key={wallet.label} style={{ borderTop: "1px solid #393940", paddingTop: 10 }}>
                   <b>{wallet.label}</b>

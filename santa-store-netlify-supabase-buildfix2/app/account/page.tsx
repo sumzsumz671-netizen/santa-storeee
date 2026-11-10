@@ -172,7 +172,7 @@ export default function Account() {
       {loading ? (
         <div className="notice" style={{ maxWidth: 720, margin: "55px auto" }}>Loading your account…</div>
       ) : userEmail ? (
-        <section style={{ maxWidth: 900, margin: "45px auto" }}>
+        <section className="sumz-account-shell">
           <div className="eyebrow">CUSTOMER ACCOUNT</div>
           <h1 style={{ fontSize: 34, margin: "8px 0" }}>Welcome back</h1>
           <p className="muted">Your orders and account information in one place.</p>
@@ -185,20 +185,20 @@ export default function Account() {
             </div>
           ) : null}
 
-          <div className="grid" style={{ marginTop: 24, gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
-            <div className="product pbody">
+          <div className="sumz-account-stats">
+            <div className="sumz-account-stat sumz-account-email">
               <div className="muted">Signed in as</div>
               <h3 style={{ marginTop: 9, overflowWrap: "anywhere" }}>{userEmail}</h3>
             </div>
-            <div className="product pbody">
+            <div className="sumz-account-stat">
               <div className="muted">Account type</div>
               <h3 style={{ marginTop: 9, textTransform: "capitalize" }}>{role}</h3>
             </div>
-            <div className="product pbody">
+            <div className="sumz-account-stat">
               <div className="muted">Orders</div>
               <h3 style={{ marginTop: 9 }}>{orders.length}</h3>
             </div>
-            <div className="product pbody">
+            <div className="sumz-account-stat sumz-account-balance">
               <div className="muted">Store balance</div>
               <h3 style={{ marginTop: 9, color: "#86efac" }}>{money(balance)}</h3>
             </div>
@@ -247,7 +247,7 @@ export default function Account() {
             )}
           </div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: 38, marginBottom: 14 }}>
+          <div className="sumz-orders-heading">
             <h2 style={{ fontSize: 25, margin: 0 }}>Order history</h2>
             <button className="btn secondary" type="button" disabled={busy} onClick={signOut}>Sign out</button>
           </div>
@@ -263,7 +263,7 @@ export default function Account() {
           ) : (
             <div style={{ display: "grid", gap: 14 }}>
               {orders.map(order => (
-                <article className="product pbody" key={order.id}>
+                <article className="sumz-order-card" key={order.id}>
                   <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 10 }}>
                     <div>
                       <div className="muted">Order number</div>

@@ -30,7 +30,7 @@ export default function ManualCheckout({
   warrantyPriceCents?: number | null;
 }) {
   const [method, setMethod] = useState("cash_app");
-  const [selectedCrypto, setSelectedCrypto] = useState("ltc");
+  const [selectedCrypto, setSelectedCrypto] = useState<"ltc" | "btc" | "sol">("ltc");
   const [withWarranty, setWithWarranty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");

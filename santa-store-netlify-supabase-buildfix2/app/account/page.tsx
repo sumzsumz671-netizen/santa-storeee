@@ -173,7 +173,19 @@ export default function Account() {
         <div className="notice" style={{ maxWidth: 720, margin: "55px auto" }}>Loading your account…</div>
       ) : userEmail ? (
         <section className="sumz-account-shell sumz-nfa-layout">
-          <aside className="sumz-nfa-sidebar"><div className="sumz-nfa-user"><span className="sumz-nfa-avatar">{(userEmail[0]||"S").toUpperCase()}</span><div><b>{userEmail}</b><small><i/> Verified Customer</small></div></div><nav><a className="active" href="#account-dashboard">▦ <span>Dashboard</span></a><a href="#account-orders">▤ <span>My Orders</span></a><a href="#account-balance">▣ <span>Balance</span></a><a href="#account-support">▧ <span>Support</span></a><button onClick={signOut} disabled={busy}>⇥ <span>Logout</span></button></nav></aside>
+          <aside className="sumz-nfa-sidebar">
+            <div className="sumz-nfa-user">
+              <span className="sumz-nfa-avatar">{(userEmail.charAt(0) || "S").toUpperCase()}</span>
+              <div><b>{userEmail}</b><small><i /> Verified Customer</small></div>
+            </div>
+            <nav>
+              <a className="active" href="#account-dashboard"><span aria-hidden="true">▦</span><span>Dashboard</span></a>
+              <a href="#account-orders"><span aria-hidden="true">▤</span><span>My Orders</span></a>
+              <a href="#account-balance"><span aria-hidden="true">▣</span><span>Balance</span></a>
+              <a href="#account-support"><span aria-hidden="true">▧</span><span>Support</span></a>
+              <button type="button" onClick={signOut} disabled={busy}><span aria-hidden="true">⇥</span><span>Logout</span></button>
+            </nav>
+          </aside>
           <div className="sumz-nfa-content">
           <div className="eyebrow">CUSTOMER ACCOUNT</div>
           <h1 style={{ fontSize: 34, margin: "8px 0" }}>Welcome back</h1>

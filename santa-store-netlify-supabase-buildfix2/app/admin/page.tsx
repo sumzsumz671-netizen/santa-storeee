@@ -199,7 +199,7 @@ export default function Admin() {
   return (
     <main className="wrap admin-shell">
       <nav className="nav">
-        <a className="logo" href="/">🎄 SANTA<span>STORE</span> <span style={{ color: "#a1a1aa", fontSize: 13 }}>ADMIN</span></a>
+        <a className="logo" href="/"><span style={{color:"#a78bfa"}}>SUMZ</span><span> STORE</span> <span style={{ color: "#a1a1aa", fontSize: 13 }}>ADMIN</span></a>
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
           <a className="muted" href="/">Storefront</a>
           <a className="muted" href="/account">Customer account</a>
@@ -228,7 +228,7 @@ export default function Admin() {
         <section style={{ margin: "35px auto", maxWidth: 1120 }}>
           <div className="admin-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: 18, flexWrap: "wrap", padding: "26px 0 20px", borderBottom: "1px solid #253d29" }}>
             <div>
-              <div className="eyebrow">SUMZ MARKET · CONTROL CENTER</div>
+              <div className="eyebrow">SUMZ STORE · CONTROL CENTER</div>
               <h1 style={{ fontSize: 36, margin: "8px 0" }}>Welcome back, {role === "owner" ? "Owner" : role}</h1>
               <p className="muted">Signed in as {userEmail}. Your store operations at a glance.</p>
             </div>

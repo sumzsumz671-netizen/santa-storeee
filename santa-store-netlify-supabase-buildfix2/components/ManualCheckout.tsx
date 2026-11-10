@@ -127,9 +127,7 @@ export default function ManualCheckout({
           </div>
           <div className="sumz-order-total"><span>Order total</span><strong>${(displayedTotal / 100).toFixed(2)} <small>USD</small></strong></div>
           <button className="sumz-place-order" type="button" disabled={busy} onClick={placeOrder}><span>{busy?"Creating order…":"Continue to payment"}</span><b>→</b></button>
-          <p className="muted" style={{ margin: "9px 0 0", lineHeight: 1.5 }}>
-            By purchasing, you agree to our <a href="/terms" className="sumz-terms-link">Terms of Service</a>.
-          </p>
+          <p className="sumz-checkout-terms">By continuing, you agree to our <a href="/terms" className="sumz-terms-link">Terms</a>.</p>
         </>
       ) : (
         <section className="sumz-payment-instructions">
@@ -219,11 +217,7 @@ export default function ManualCheckout({
         </div>
       ) : null}
       {copied ? <div className="muted" role="status" style={{ marginTop: 7 }}>{copied}</div> : null}
-      {!orderNumber ? (
-        <p className="muted" style={{ margin: "8px 0 0", lineHeight: 1.45 }}>
-          {productName}. Place your order to see the payment destination and order reference.
-        </p>
-      ) : null}
+      {!orderNumber ? <p className="sumz-checkout-hint">Secure checkout · Order details appear after you continue.</p> : null}
     </div>
   );
 }

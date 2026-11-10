@@ -30,6 +30,7 @@ export default function ManualCheckout({
   warrantyPriceCents?: number | null;
 }) {
   const [method, setMethod] = useState("cash_app");
+  const [selectedCrypto, setSelectedCrypto] = useState("ltc");
   const [withWarranty, setWithWarranty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -103,7 +104,7 @@ export default function ManualCheckout({
   }
 
   return (
-    <div style={{ marginTop: 10, borderTop: "1px solid #303036", paddingTop: 12 }}>
+    <div className="sumz-checkout">
       {typeof warrantyPriceCents === "number" ? (
         <label className="muted" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <input
@@ -118,30 +119,23 @@ export default function ManualCheckout({
 
       {!orderNumber ? (
         <>
-          <label className="muted" htmlFor={"method-" + productId}>Payment method</label>
-          <select
-            id={"method-" + productId}
-            className="input"
-            style={{ width: "100%", marginTop: 7 }}
-            value={method}
-            onChange={event => setMethod(event.target.value)}
-            disabled={busy}
-          >
-            {METHODS.map(option => <option value={option.value} key={option.value}>{option.label}</option>)}
-          </select>
-          <div className="muted" style={{ marginTop: 8 }}>Total: <b style={{ color: "white" }}>${(displayedTotal / 100).toFixed(2)}</b></div>
-          <button className="btn secondary" type="button" style={{ width: "100%", marginTop: 8 }} disabled={busy} onClick={placeOrder}>
-            {busy ? "Creating order…" : "Place order"}
-          </button>
+          <div className="sumz-payment-label">Choose payment method</div>
+          <div className="sumz-payment-grid" role="radiogroup" aria-label="Payment method">
+            {METHODS.map(option => <button type="button" key={option.value} className={"sumz-payment-choice "+(method===option.value?"is-selected":"")} onClick={()=>setMethod(option.value)} disabled={busy} aria-pressed={method===option.value}>
+              <span className={"sumz-payment-icon sumz-icon-"+option.value}>{option.value==="cash_app"?"$":option.value==="paypal"?"P":option.value==="crypto"?"₿":"G"}</span><span className="sumz-payment-copy"><b>{option.label}</b><small>{option.value==="cash_app"?"Fast mobile payment":option.value==="paypal"?"Pay securely with PayPal":option.value==="crypto"?"LTC · BTC · SOL":"Gift Me Crypto"}</small></span><span className="sumz-payment-radio">{method===option.value?"✓":""}</span>
+            </button>)}
+          </div>
+          <div className="sumz-order-total"><span>Order total</span><strong>${(displayedTotal / 100).toFixed(2)} <small>USD</small></strong></div>
+          <button className="sumz-place-order" type="button" disabled={busy} onClick={placeOrder}><span>{busy?"Creating order…":"Continue to payment"}</span><b>→</b></button>
           <p className="muted" style={{ margin: "9px 0 0", lineHeight: 1.5 }}>
-            By purchasing, you agree to our <a href="/terms" style={{ color: "#d8a8ff", textDecoration: "underline" }}>Terms of Service</a>.
+            By purchasing, you agree to our <a href="/terms" className="sumz-terms-link">Terms of Service</a>.
           </p>
         </>
       ) : (
-        <section style={{ border: "1px solid #444", borderRadius: 12, padding: 13, marginTop: 10 }}>
+        <section className="sumz-payment-instructions">
           <div className="eyebrow">PAYMENT INSTRUCTIONS</div>
           <h4 style={{ margin: "7px 0" }}>Order {orderNumber}</h4>
-          <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 12 }}>${(totalCents / 100).toFixed(2)} USD</div>
+          <div className="sumz-payment-total">${(totalCents / 100).toFixed(2)} <small>USD</small></div>
 
           {method === "cash_app" ? (
             <div>
@@ -186,7 +180,8 @@ export default function ManualCheckout({
 
           {method === "crypto" ? (
             <div style={{ display: "grid", gap: 12 }}>
-              {[PAYMENT_DETAILS.ltc, PAYMENT_DETAILS.sol, PAYMENT_DETAILS.btc].map(wallet => (
+              <div className="sumz-crypto-tabs">{(["ltc","btc","sol"] as const).map((coin)=><button type="button" className={selectedCrypto===coin?"active":""} key={coin} onClick={()=>setSelectedCrypto(coin}>{coin.toUpperCase()}</button>)}</div>
+              {[PAYMENT_DETAILS[selectedCrypto]].map(wallet => (
                 <div key={wallet.label} style={{ borderTop: "1px solid #393940", paddingTop: 10 }}>
                   <b>{wallet.label}</b>
                   <div style={{ overflowWrap: "anywhere", margin: "6px 0", fontSize: 12 }}>{wallet.recipient}</div>
@@ -205,7 +200,7 @@ export default function ManualCheckout({
             </div>
           ) : null}
 
-          <div style={{ borderTop: "1px solid #393940", marginTop: 13, paddingTop: 12 }}>
+          <div className="sumz-payment-reference">
             <b>Payment reference / note</b>
             <p className="muted" style={{ margin: "5px 0" }}>Use your real order number so the payment can be matched to your purchase. Do not use an unrelated description.</p>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -213,7 +208,7 @@ export default function ManualCheckout({
               <button className="btn secondary" type="button" onClick={() => void copyValue("Order number", orderNumber)}>Copy order number</button>
             </div>
           </div>
-          <a className="btn" href="/account" style={{ width: "100%", marginTop: 14 }}>Go to My Account · I Have Paid</a>
+          <a className="sumz-place-order" href="/account"><span>Open order chat · I Have Paid</span><b>→</b></a>
         </section>
       )}
 

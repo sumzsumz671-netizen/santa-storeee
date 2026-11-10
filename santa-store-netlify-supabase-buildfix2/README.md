@@ -1,37 +1,43 @@
-# Santa Store — Netlify + Supabase
+# Sumz Store — storefront + admin
 
-Holiday storefront scaffold for Sumz Market. Includes Next.js pages, Supabase client, customer email/password sign-up/sign-in/password-reset UI, product catalog display, and starter SQL.
+Sumz Store is the new premium black/purple storefront being built in this repository. It is separate from the Sumz License Panel database and must only call the licensing service through a scoped server-to-server integration.
 
-## Run locally
+## Domains
+- Customer: `https://sumz.store`
+- Admin: `https://admin.sumz.store` (host-based rewrite routes the root to `/admin`)
+
+Configure both custom domains on the same Netlify site and point their DNS records at Netlify. In Supabase Auth URL Configuration, set the Site URL to `https://sumz.store` and allow `https://sumz.store/**` plus `https://admin.sumz.store/**`.
+
+## Local setup
 1. `npm install`
-2. Copy `.env.example` to `.env.local`, fill the Supabase Project URL and anon key.
-3. Run `supabase/schema.sql` in Supabase SQL Editor.
+2. Copy `.env.example` to `.env.local` and configure Supabase.
+3. Run the existing Supabase migrations in timestamp order, including `20261109190000_sumz_store_platform.sql`.
 4. `npm run dev`
 
-## Deploy to Netlify
-- Push this folder to a GitHub repository.
-- In Netlify, import the repository. Netlify's Next.js runtime handles routing/server rendering.
-- Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as environment variables.
-- Add `sumz.store` and `admin.sumz.store` DNS/domain configuration.
-- In Supabase Auth > URL Configuration, set Site URL to `https://sumz.store` and add redirect URLs for `https://sumz.store/**` and `https://admin.sumz.store/**`.
-- Configure Supabase SMTP (production email) and your verified sender domain.
+## Implemented in this build
+- Premium Sumz Store storefront design, responsive catalog sections, live active-product query, customer account entry point, and store footer.
+- Admin hostname routing to the existing staff-gated admin area.
+- Store schema foundation for product variants, images/metadata, coupons, carts, payment records, fulfillment records, and audit events.
+- Existing Sumz Market auth, account, order, support, inventory, and admin flows retained.
 
-## Current status (starter, not yet production-ready)
-- Home page uses a preview catalog if no products are present; seed products are not actual stock.
-- Supabase auth UI supports sign up, sign in, reset email; verify redirect and configure SMTP.
-- Admin page is only a login shell. Add server-side role authorization + admin product/order management before opening it.
-- No checkout/order creation or payment verification yet; no auto-delivery or Fenar integration yet.
-- Add payment methods through compliant commercial payment workflows. Cash App/PayPal manual review, Rewarble redemption checks, and crypto network confirmations must be verified server-side before fulfillment.
-- Product/account trading may violate game/platform terms and payment-provider policies. Confirm legality and provider approval before accepting orders.
-- Do not add any secret keys to client-side or `NEXT_PUBLIC_` environment variables.
+## Not yet production-enabled (do not represent as complete)
+- **License Panel integration:** the actual Sumz License Panel source/repository and audited API contract are not present in this storefront repository. No licensing endpoint is guessed or overwritten. Provide the panel repository and audit artifact to implement against its real issuance/refresh protocol.
+- **Checkout/payment webhooks:** no live payment processing is enabled. Stripe must remain test-only until the processor gives written approval for each product category and the merchant account is configured. A crypto adapter still needs an approved provider.
+- **Fulfillment worker, email delivery, product media upload, MFA, and production reconciliation** require additional implementation/configuration and tests before launch.
+- The new schema migration has been committed but has **not been applied** to your Supabase project by this code change.
+- No production deployment or production license data was changed.
 
-## Product entry
-Insert products into `public.products`; prices are integer cents. `price_max_cents` displays a range. Keep `active=false` until an item is ready for publication.
+## Security rules
+- Never expose `SUPABASE_SERVICE_ROLE_KEY`, payment secrets, or license-service credentials in `NEXT_PUBLIC_*` variables or client bundles.
+- Admin writes must be server-side, role checked, and audit logged. Do not add permissive browser write policies.
+- Fulfill licenses only after server-verified payment events; use stable order-item idempotency keys and reconciliation.
+- Do not bypass payment-provider restrictions or misrepresent product descriptions.
 
-## Next implementation milestones
-1. Admin role + RLS policies and secure server actions.
-2. Product CRUD/image upload (Supabase Storage).
-3. Checkout, order/payment proof, admin approve/reject and audit log.
-4. Rewarble and crypto payment verification; confirmations and duplicate webhook protection.
-5. Email templates via Resend and Supabase SMTP.
-6. Inventory reservation and delivery workflow, tests, monitoring, backup plan.
+## Deployment checklist
+- [ ] Apply migration(s) in Supabase and verify RLS.
+- [ ] Configure both domains + HTTPS in Netlify.
+- [ ] Configure Supabase SMTP and auth redirect URLs.
+- [ ] Set server-only provider credentials in Netlify environment variables.
+- [ ] Supply Sumz License Panel repository/API docs; validate in a non-production environment.
+- [ ] Complete tests, security review, and a staged checkout/fulfillment simulation.
+- [ ] Explicit approval before enabling live payments, changing production license data, or deploying production.

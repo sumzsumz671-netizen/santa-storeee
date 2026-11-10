@@ -210,6 +210,17 @@ export default function Account() {
             </div>
           ) : null}
 
+          <section className="sumz-support-center">
+            <div className="sumz-support-hero"><div className="sumz-support-orb">✦</div><div className="sumz-support-eyebrow">SUMZ CUSTOMER CARE</div><h2>How can we help?</h2><p>Need help with an order, payment, or your account? Pick a topic below and our team will help.</p><a className="sumz-support-cta" href="#order-support">Get support <span>↗</span></a></div>
+            <div className="sumz-support-topics">
+              <a href="#order-support" className="sumz-support-topic"><span className="sumz-topic-icon">▣</span><b>Order support</b><small>Delivery, access & purchases</small><span className="sumz-topic-arrow">↗</span></a>
+              <a href="#order-support" className="sumz-support-topic"><span className="sumz-topic-icon">$</span><b>Payment issues</b><small>Payment & balance help</small><span className="sumz-topic-arrow">↗</span></a>
+              <a href="#order-support" className="sumz-support-topic"><span className="sumz-topic-icon">⌘</span><b>Account & licenses</b><small>Login, access & licenses</small><span className="sumz-topic-arrow">↗</span></a>
+              <a href="https://discord.com/invite/sumz" target="_blank" rel="noreferrer" className="sumz-support-topic"><span className="sumz-topic-icon">☏</span><b>Community help</b><small>Join our Discord</small><span className="sumz-topic-arrow">↗</span></a>
+            </div>
+            <div className="sumz-ticket-head" id="order-support"><div><span className="sumz-support-eyebrow">YOUR CONVERSATIONS</span><h3>Support tickets</h3><p>Open a conversation from one of your orders below.</p></div><span className="sumz-ticket-count">{Object.keys(conversationsByOrder).length} linked</span></div>
+            <div className="sumz-ticket-note">ⓘ To start a ticket, open an order below and use its private support chat. Conversations stay linked to your order.</div>
+          </section>
           <WalletTopUp onWalletUpdated={loadDashboard} />
 
           <div style={{ marginTop: 38, marginBottom: 14 }}>

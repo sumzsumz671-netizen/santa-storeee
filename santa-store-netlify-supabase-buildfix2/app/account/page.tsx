@@ -172,7 +172,9 @@ export default function Account() {
       {loading ? (
         <div className="notice" style={{ maxWidth: 720, margin: "55px auto" }}>Loading your account…</div>
       ) : userEmail ? (
-        <section className="sumz-account-shell">
+        <section className="sumz-account-shell sumz-nfa-layout">
+          <aside className="sumz-nfa-sidebar"><div className="sumz-nfa-user"><span className="sumz-nfa-avatar">{(userEmail[0]||"S").toUpperCase()}</span><div><b>{userEmail}</b><small><i/> Verified Customer</small></div></div><nav><a className="active" href="#account-dashboard">▦ <span>Dashboard</span></a><a href="#account-orders">▤ <span>My Orders</span></a><a href="#account-balance">▣ <span>Balance</span></a><a href="#account-support">▧ <span>Support</span></a><button onClick={signOut} disabled={busy}>⇥ <span>Logout</span></button></nav></aside>
+          <div className="sumz-nfa-content">
           <div className="eyebrow">CUSTOMER ACCOUNT</div>
           <h1 style={{ fontSize: 34, margin: "8px 0" }}>Welcome back</h1>
           <p className="muted">Your orders and account information in one place.</p>
@@ -185,7 +187,7 @@ export default function Account() {
             </div>
           ) : null}
 
-          <div className="sumz-account-stats">
+          <div id="account-dashboard" className="sumz-account-stats">
             <div className="sumz-account-stat sumz-account-email">
               <div className="muted">Signed in as</div>
               <h3 style={{ marginTop: 9, overflowWrap: "anywhere" }}>{userEmail}</h3>
@@ -210,7 +212,7 @@ export default function Account() {
             </div>
           ) : null}
 
-          <section className="sumz-support-center">
+          <section id="account-support" className="sumz-support-center">
             <div className="sumz-support-hero"><div className="sumz-support-orb">✦</div><div className="sumz-support-eyebrow">SUMZ CUSTOMER CARE</div><h2>How can we help?</h2><p>Need help with an order, payment, or your account? Pick a topic below and our team will help.</p><a className="sumz-support-cta" href="#order-support">Get support <span>↗</span></a></div>
             <div className="sumz-support-topics">
               <a href="#order-support" className="sumz-support-topic"><span className="sumz-topic-icon">▣</span><b>Order support</b><small>Delivery, access & purchases</small><span className="sumz-topic-arrow">↗</span></a>
@@ -221,7 +223,7 @@ export default function Account() {
             <div className="sumz-ticket-head" id="order-support"><div><span className="sumz-support-eyebrow">YOUR CONVERSATIONS</span><h3>Support tickets</h3><p>Open a conversation from one of your orders below.</p></div><span className="sumz-ticket-count">{Object.keys(conversationsByOrder).length} linked</span></div>
             <div className="sumz-ticket-note">ⓘ To start a ticket, open an order below and use its private support chat. Conversations stay linked to your order.</div>
           </section>
-          <WalletTopUp onWalletUpdated={loadDashboard} />
+          <div id="account-balance"><WalletTopUp onWalletUpdated={loadDashboard} /></div>
 
           <div style={{ marginTop: 38, marginBottom: 14 }}>
             <h2 style={{ fontSize: 25, marginBottom: 12 }}>Store balance activity</h2>
@@ -247,7 +249,7 @@ export default function Account() {
             )}
           </div>
 
-          <div className="sumz-orders-heading">
+          <div id="account-orders" className="sumz-orders-heading">
             <h2 style={{ fontSize: 25, margin: 0 }}>Order history</h2>
             <button className="btn secondary" type="button" disabled={busy} onClick={signOut}>Sign out</button>
           </div>

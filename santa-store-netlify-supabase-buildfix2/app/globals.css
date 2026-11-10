@@ -1539,3 +1539,14 @@ body:has(.sumz-payment-instructions){overflow:hidden!important}
 .sumz-payment-instructions>div:not(.eyebrow):not(.sumz-payment-reference),.sumz-payment-instructions .sumz-payment-reference,.sumz-payment-instructions .sumz-place-order{grid-column:2;min-width:0}
 .sumz-payment-instructions code{max-width:100%;overflow-wrap:anywhere}.sumz-payment-instructions a,.sumz-payment-instructions button{min-height:48px;box-sizing:border-box}.sumz-payment-instructions .muted{color:#a9a0bd!important;line-height:1.65!important}
 @media(max-width:700px){.sumz-payment-instructions{grid-template-columns:minmax(0,1fr)!important;padding:22px!important;gap:12px!important}.sumz-payment-instructions .eyebrow,.sumz-payment-instructions h4,.sumz-payment-instructions .sumz-payment-total,.sumz-payment-instructions>div:not(.eyebrow):not(.sumz-payment-reference),.sumz-payment-instructions .sumz-payment-reference,.sumz-payment-instructions .sumz-place-order{grid-column:1!important}}
+
+/* FIX: prevent checkout payment choices from collapsing into letter stacks */
+.sumz-payment-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;width:100%!important}
+.sumz-payment-choice{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important;width:100%!important;min-width:0!important;min-height:76px!important;padding:12px!important;box-sizing:border-box!important}
+.sumz-payment-choice *{min-width:0!important;max-width:100%!important;word-break:normal!important;overflow-wrap:anywhere!important;white-space:normal!important}
+.sumz-payment-copy{flex:1 1 auto!important;width:auto!important;min-width:0!important}
+.sumz-payment-copy b,.sumz-payment-copy small{display:block!important;width:auto!important;white-space:normal!important;word-break:normal!important;overflow-wrap:anywhere!important;line-height:1.35!important}
+.sumz-payment-icon,.sumz-payment-radio{flex:0 0 auto!important}
+.sumz-payment-instructions{grid-template-columns:minmax(0,1fr)!important}
+.sumz-payment-instructions>*{grid-column:1!important;min-width:0!important}
+@media(max-width:520px){.sumz-payment-grid{grid-template-columns:1fr!important}.sumz-payment-choice{min-height:64px!important}}

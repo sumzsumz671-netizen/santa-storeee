@@ -1529,3 +1529,13 @@ body{background:#09080e!important;color:#f4f2fa!important}
 .sumz-checkout-terms,.sumz-checkout-hint{font-size:11px!important;line-height:1.6!important;color:#a69abf!important}
 .sumz-payment-instructions{background:#100e18!important;border-color:#30243f!important;border-radius:14px!important}
 @media(max-width:420px){.sumz-payment-grid{grid-template-columns:1fr!important}.sumz-payment-choice{min-height:62px!important}}
+
+/* Full viewport payment step; escape the narrow product modal */
+body:has(.sumz-payment-instructions){overflow:hidden!important}
+.sumz-payment-instructions{position:fixed!important;z-index:100000!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;overflow:auto!important;box-sizing:border-box!important;margin:0!important;padding:clamp(22px,5vw,64px)!important;border:0!important;border-radius:0!important;background:radial-gradient(ellipse at 75% 0%,#21133b 0%,transparent 42%),#08080d!important;color:#f4f0ff!important;display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr)!important;align-content:start!important;gap:24px!important}
+.sumz-payment-instructions:before{content:"SUMZ  /  SECURE CHECKOUT";grid-column:1/-1;display:block;color:#a78bfa;font-size:12px;font-weight:900;letter-spacing:2px;padding-bottom:16px;border-bottom:1px solid #282033}
+.sumz-payment-instructions .eyebrow,.sumz-payment-instructions h4,.sumz-payment-instructions .sumz-payment-total{grid-column:2;overflow-wrap:anywhere}
+.sumz-payment-instructions h4{font-size:clamp(20px,3vw,30px)!important}.sumz-payment-instructions .sumz-payment-total{font-size:clamp(32px,5vw,48px)!important}
+.sumz-payment-instructions>div:not(.eyebrow):not(.sumz-payment-reference),.sumz-payment-instructions .sumz-payment-reference,.sumz-payment-instructions .sumz-place-order{grid-column:2;min-width:0}
+.sumz-payment-instructions code{max-width:100%;overflow-wrap:anywhere}.sumz-payment-instructions a,.sumz-payment-instructions button{min-height:48px;box-sizing:border-box}.sumz-payment-instructions .muted{color:#a9a0bd!important;line-height:1.65!important}
+@media(max-width:700px){.sumz-payment-instructions{grid-template-columns:minmax(0,1fr)!important;padding:22px!important;gap:12px!important}.sumz-payment-instructions .eyebrow,.sumz-payment-instructions h4,.sumz-payment-instructions .sumz-payment-total,.sumz-payment-instructions>div:not(.eyebrow):not(.sumz-payment-reference),.sumz-payment-instructions .sumz-payment-reference,.sumz-payment-instructions .sumz-place-order{grid-column:1!important}}

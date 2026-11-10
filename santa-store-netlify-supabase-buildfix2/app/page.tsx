@@ -37,7 +37,7 @@ export default async function Home() {
   return <div className="sumz-store min-h-screen bg-[#08070d] text-white">
     <header className="sticky top-0 z-40 border-b border-white/[.08] bg-[#08070d]/90 backdrop-blur-xl">
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4">
-        <a href="/" className="flex items-center gap-3 font-black tracking-tight"><span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-700 text-xl shadow-lg shadow-violet-900/40">S</span><span className="text-xl">SUMZ<span className="text-violet-400"> STORE</span><small className="block text-[10px] font-semibold tracking-[.25em] text-zinc-500">DIGITAL GOODS</small></span></a>
+        <a href="/" className="flex items-center gap-3 font-black tracking-tight"><img src="/sumz-logo.svg" alt="Sumz logo" className="sumz-brand-logo h-12 w-12 object-contain" /><span className="text-xl">SUMZ<span className="text-violet-400"> STORE</span><small className="block text-[10px] font-semibold tracking-[.25em] text-zinc-500">DIGITAL GOODS</small></span></a>
         <div className="hidden items-center gap-7 text-sm text-zinc-400 md:flex"><a className="hover:text-white" href="#catalog">Catalog</a><a className="hover:text-white" href="/account">My licenses & orders</a><a className="hover:text-white" href="/account">Support</a></div>
         <div className="flex items-center gap-3"><MarketAuthLinks/><a href="#catalog" className="rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-bold transition hover:bg-violet-500">Browse store ↗</a></div>
       </nav>

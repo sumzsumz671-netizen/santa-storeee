@@ -1378,3 +1378,56 @@ body{background:#09080e!important;color:#f4f2fa!important}
 .market-footer{max-width:1440px!important;border-color:#262333!important;color:#777184!important}
 .market-footer a:hover{color:#b9a2ff!important}
 @media(max-width:760px){.market-nav{padding:12px 16px!important}.market-nav-links{gap:2px!important}.market-nav-links a{padding:8px!important}.market-wrap{padding:16px!important}.market-hero{grid-template-columns:1fr!important}.market-hero-copy{padding:35px 24px 20px!important}.market-hero-visual{min-height:260px!important}.market-hero-bottom{flex-direction:column!important}.market-features{grid-template-columns:repeat(2,1fr)!important}.market-nav-discord{display:none!important}}
+
+
+/* Sumz Store clean SellAuth-inspired product cards + checkout */
+.market-category-modal-backdrop { position:fixed;inset:0;z-index:80;display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;background:rgba(2,4,10,.78);backdrop-filter:blur(10px); }
+.market-category-modal { width:min(1120px,100%);max-height:calc(100vh - 48px);overflow:auto;border:1px solid #29364e;border-radius:18px;background:#0b1425;box-shadow:0 30px 100px #0008; }
+.market-category-modal>header { position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #26334a;background:#0b1425; }
+.market-category-modal>header h2 { margin:0;color:#f4f7ff;font-size:22px;font-weight:800; }
+.market-category-modal>header button { width:34px;height:34px;border:0;border-radius:8px;background:#17243a;color:#aebbd1;font-size:24px;cursor:pointer; }
+.market-category-modal>p { margin:0;padding:12px 24px;color:#9aa9c1;font-size:13px; }
+.market-category-modal-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:16px;padding:18px 20px 24px;align-items:start; }
+.market-product { border:1px solid #25344c!important;border-radius:14px!important;background:#0e1728!important;box-shadow:0 8px 22px #0002!important;overflow:hidden; }
+.market-product:hover { transform:translateY(-2px)!important;border-color:#405777!important;box-shadow:0 12px 28px #0004!important; }
+.market-product-art { height:145px!important;background:radial-gradient(ellipse at 50% 60%,#1b3b29,#10251c 60%,#0c1a17)!important; }
+.market-product-art:before { border-color:#ffffff10!important; }
+.market-product-badge { background:#20223a!important;border:1px solid #3b3a64!important;color:#c5c7ff!important;font-size:9px!important;letter-spacing:.3px; }
+.market-product-body { padding:15px!important; }
+.market-product-body h3 { min-height:0!important;font-size:15px!important;line-height:1.45!important;color:#edf3ff!important;font-weight:700; }
+.market-product-body>p { margin:7px 0 0!important;color:#9eacc2!important;font-size:12px!important;line-height:1.55!important; }
+.market-product-price { margin:12px 0 8px!important;color:#b8a7ff!important;font-size:22px!important;text-shadow:none!important; }
+.market-price-options { margin:12px 0!important;gap:8px!important; }
+.market-price-option { border-color:#28364e!important;background:#111d30!important;border-radius:10px!important; }
+.market-price-option span { color:#9aabc4!important; }
+.market-price-option strong { color:#c7baff!important;font-size:16px!important; }
+.market-stock { margin-top:10px!important;color:#8fa0b8!important;font-size:11px!important; }
+.market-buy-actions { display:grid!important;gap:8px!important;margin-top:12px!important; }
+.market-buy-actions .btn { margin:0!important;min-height:42px!important;border-radius:9px!important;font-size:12px!important; }
+.market-buy-actions .btn:not(.secondary) { background:linear-gradient(135deg,#6655e8,#4e8df4)!important; }
+.market-buy-actions .btn.secondary { background:#18263b!important;border:1px solid #30435f!important;color:#d9e5f8!important; }
+.market-buy-actions .input,.sumz-checkout select { background:#0b1424!important;border:1px solid #2b3a53!important;border-radius:9px!important;color:#e7efff!important; }
+.sumz-checkout { margin-top:13px!important;padding-top:13px!important;border-top:1px solid #25334a!important;color:#dce7f8; }
+.sumz-payment-label { margin-bottom:9px;color:#a6b5cc;font-size:11px;font-weight:700; }
+.sumz-payment-grid { display:grid;gap:7px; }
+.sumz-payment-choice { display:flex;align-items:center;gap:10px;width:100%;min-width:0;text-align:left;padding:10px;border:1px solid #27364e;border-radius:10px;background:#101b2d;color:#e8f0ff;cursor:pointer;transition:border-color .16s,background .16s; }
+.sumz-payment-choice:hover { border-color:#465e81;background:#142238; }
+.sumz-payment-choice.is-selected { border-color:#6c65e8;background:linear-gradient(100deg,#24234a,#14243a);box-shadow:inset 0 0 0 1px #6259d533; }
+.sumz-payment-icon { display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:#202d45;color:#b9c9ff;font-size:17px;font-weight:900; }
+.sumz-icon-cash_app { background:#163a2e;color:#65e6a1; }.sumz-icon-paypal { background:#182f54;color:#83b7ff; }.sumz-icon-crypto { background:#3c2e19;color:#ffc56a; }.sumz-icon-g2a_crypto { background:#30214c;color:#d4a9ff; }
+.sumz-payment-copy { min-width:0;flex:1; }.sumz-payment-copy b,.sumz-payment-copy small { display:block; }.sumz-payment-copy b { font-size:12px; }.sumz-payment-copy small { margin-top:3px;color:#879ab5;font-size:10px; }
+.sumz-payment-radio { display:grid;place-items:center;width:18px;height:18px;border:1px solid #3b4d68;border-radius:50%;color:#fff;font-size:11px; }.is-selected .sumz-payment-radio { border-color:#7771f0;background:#6259dc; }
+.sumz-order-total { display:flex;align-items:center;justify-content:space-between;margin:12px 0;padding:12px;border:1px solid #26364e;border-radius:10px;background:#0b1424; }.sumz-order-total span { color:#91a2bb;font-size:12px; }.sumz-order-total strong { color:#f2f6ff;font-size:21px; }.sumz-order-total small,.sumz-payment-total small { color:#94a6bf;font-size:10px;font-weight:600; }
+.sumz-place-order { display:flex!important;align-items:center;justify-content:space-between;width:100%;margin-top:8px;padding:12px 15px;border:0;border-radius:10px;background:linear-gradient(100deg,#6255df,#4388ef);color:white!important;font-size:12px;font-weight:800;cursor:pointer; }.sumz-place-order:hover { filter:brightness(1.08); }.sumz-place-order:disabled { opacity:.6;cursor:wait; }.sumz-place-order b { font-size:18px; }
+.sumz-terms-link { color:#aebcff;text-decoration:underline; }
+.sumz-payment-instructions { margin-top:12px;padding:14px;border:1px solid #293950;border-radius:12px;background:#0b1424; }
+.sumz-payment-instructions .eyebrow { color:#9e9cff;font-size:10px;letter-spacing:1.5px; }
+.sumz-payment-instructions h4 { margin:8px 0;color:#e8f0ff; }
+.sumz-payment-total { margin-bottom:12px;color:#c4b8ff;font-size:27px;font-weight:900; }
+.sumz-payment-instructions code { padding:6px 8px;border:1px solid #293950;border-radius:7px;background:#111d30;color:#d6e4ff;font-size:11px;overflow-wrap:anywhere; }
+.sumz-payment-instructions .btn { min-height:38px;border-radius:9px;font-size:11px; }
+.sumz-payment-instructions .btn:not(.secondary) { background:linear-gradient(135deg,#6255df,#4388ef); }
+.sumz-payment-instructions .btn.secondary { background:#17243a;border:1px solid #30435f; }
+.sumz-crypto-tabs { display:flex;gap:6px; }.sumz-crypto-tabs button { flex:1;padding:8px;border:1px solid #2b3b54;border-radius:8px;background:#111d30;color:#9eb0ca;font-size:11px;font-weight:800;cursor:pointer; }.sumz-crypto-tabs button.active { border-color:#6c65e8;background:#24234a;color:#d9d5ff; }
+.sumz-payment-reference { margin-top:13px;padding-top:12px;border-top:1px solid #26364e; }.sumz-payment-reference>b { font-size:12px; }
+@media(max-width:600px) { .market-category-modal-backdrop { padding:8px; }.market-category-modal { max-height:calc(100vh - 16px); }.market-category-modal-grid { grid-template-columns:1fr; }.market-product-art { height:125px!important; }.sumz-payment-copy small { font-size:9px; } }
